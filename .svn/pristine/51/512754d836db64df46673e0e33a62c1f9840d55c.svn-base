@@ -1,0 +1,198 @@
+package KamppistenKotityotAsukkaat;
+
+/**
+ * Asukasuettelo, joka voi lis‰t‰ ja poistaa asukkaita.
+ * @author Juho Kajanto
+ * @version 28.3.2016
+ */
+public class Asukkaat {
+	private static final int MAX_ASUKKAITA = 10;
+	private int              lkm           = 0;
+	private String           tiedostonNimi = "";
+	private Asukas           alkiot[]      = new Asukas[MAX_ASUKKAITA];
+	
+	/**
+	 * Oletusmuodostaja
+	 */
+	public Asukkaat() {
+		//Attribuuttien oma alustus riitt‰‰
+	}
+	
+	/**
+	 * Lis‰‰ uuden asukkaan tietorakenteeseen.
+	 * @param asukas lis‰tt‰v‰n asukkaan viite
+	 * @throws SailoException jos tietorakenne on t‰ynn‰
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException
+	 * Asukkaat asukkaat = new Asukkaat();
+	 * Asukas as1 = new Asukas(); Asukas as2 = new Asukas();
+	 * asukkaat.getLkm() === 0;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as2);
+	 * asukkaat.getLkm() === 2;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.getLkm() === 3;
+	 * asukkaat.anna(0) === as1;
+	 * asukkaat.anna(1) === as2;
+	 * asukkaat.anna(2) === as1;
+	 * asukkaat.anna(3) === as1; #THROWS IndexOutOfBoundsException
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.getLkm() === 10;
+	 * asukkaat.lisaa(as1); #THROWS SailoException
+	 * </pre>
+	 */
+	public void lisaa(Asukas asukas) throws SailoException {
+		if (lkm >= alkiot.length) throw new SailoException("Liikaa alkioita!");
+		alkiot[lkm] = asukas;
+		lkm++;
+	}
+	
+	/**
+	 * Poistaa asukkaan tietorakenteesta
+	 * @param id poistettavan asukkaan j‰rjestysnumero
+	 * @param a_lkm asukkaiden lukum‰r‰
+	 * @throws SailoException jos tietorakenne on tyhj‰
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException
+	 * Asukkaat asukkaat = new Asukkaat();
+	 * Asukas as1 = new Asukas(); Asukas as2 = new Asukas(); Asukas as3 = new Asukas();
+	 * as1.lisaaId(); as2.lisaaId(); as3.lisaaId();
+	 * asukkaat.getLkm() === 0;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as2);
+	 * asukkaat.lisaa(as3);
+	 * asukkaat.getLkm() === 3;
+	 * asukkaat.poista(as2.getId(), asukkaat.getLkm());
+	 * asukkaat.getLkm() === 2;
+	 * asukkaat.anna(0) === as1;
+	 * asukkaat.anna(1) === as3;
+	 * asukkaat.anna(2) === as3; #THROWS IndexOutOfBoundsException
+	 * </pre>
+	 */
+	public void poista(int id, int a_lkm) throws SailoException {
+		int n = etsiPaikka(id);
+		if (n >= alkiot.length) throw new SailoException("Liian v‰h‰n alkioita!");
+		for (int j = n+1; j < a_lkm; j++, n++) {
+			alkiot[n] = alkiot[j];
+			alkiot[j] = null;
+		}
+		lkm--;
+	}
+	
+	/**
+	 * Etsii etsityn asukkaan paikan taulukossa viitenumeron perusteella
+	 * @param id asukkaan viitenumero
+	 * @return asukkaan paikka taulukossa
+	 * @throws SailoException jos asukasta ei lˆydy
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException
+	 * Asukkaat asukkaat = new Asukkaat();
+	 * Asukas as1 = new Asukas(); Asukas as2 = new Asukas(); Asukas as3 = new Asukas();
+	 * as1.lisaaId(); as2.lisaaId(); as3.lisaaId();
+	 * asukkaat.getLkm() === 0;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as2);
+	 * asukkaat.lisaa(as3);
+	 * asukkaat.getLkm() === 3;
+	 * asukkaat.etsiPaikka(as1.getId()) === 0;
+	 * asukkaat.etsiPaikka(as2.getId()) === 1;
+	 * asukkaat.etsiPaikka(as3.getId()) === 2;
+	 * asukkaat.poista(as2.getId(), asukkaat.getLkm());
+	 * asukkaat.etsiPaikka(as1.getId()) === 0;
+	 * asukkaat.etsiPaikka(as2.getId()) === 1; #THROWS SailoException
+	 * asukkaat.etsiPaikka(as3.getId()) === 1;
+	 * </pre>
+	 */
+	public int etsiPaikka(int id) throws SailoException {
+		for(int i = 0; i<lkm; i++) {
+			if (alkiot[i].getId() == id) return i;
+		}
+		throw new SailoException("Asukasta ei lˆydy!");
+	}
+	
+	/**
+	 * Palauttaa viitteen haluttuun asukkaaseen
+	 * @param i halutun asukkaan j‰rjestysnumero
+	 * @return viite i:teen asukkaaseen
+	 * @throws IndexOutOfBoundsException jos i laittomalla alueella
+	 */
+	public Asukas anna(int i) throws IndexOutOfBoundsException {
+		if (i < 0 || lkm <= i) throw new IndexOutOfBoundsException("Laiton indeksi: " + i);
+		return alkiot[i];
+	}
+	
+	/**
+	 * Palauttaa asukkaiden lukum‰‰r‰n
+	 * @return asukkaiden lukum‰‰r‰
+	 */
+	public int getLkm() {
+		return lkm;
+	}
+	
+	/**
+	 * Lukee asukasluettelon tiedostosta
+	 * @param hakemisto tiedoston hakemisto
+	 * @throws SailoException jos tiedoston lukeminen ei onnistu
+	 */
+	public void LueTiedostosta(String hakemisto) throws SailoException {
+		tiedostonNimi = hakemisto + "";
+		throw new SailoException("Ei osata viel‰ lukea tiedostoa " + tiedostonNimi);
+	}
+	
+	/**
+	 * Tallentaa  asukasluettelon tiedostoon
+	 * @throws SailoException jos tallentaminen ei onnistu
+	 */
+	public void tallenna() throws SailoException {
+		throw new SailoException("Ei osata viel‰ tallentaa tiedostoa " + tiedostonNimi);
+	}
+	
+	/**
+	 * Testiohjelma Asukkaille
+	 * @param args ei k‰ytˆss‰
+	 */
+	public static void main(String[] args) {
+		Asukkaat asukkaat = new Asukkaat();
+		
+		Asukas as1 = new Asukas();
+		Asukas as2 = new Asukas();
+		Asukas as3 = new Asukas();
+		Asukas as4 = new Asukas();
+		as1.vastaaTupu();
+		as2.vastaaTupu();
+		as3.vastaaTupu();
+		as4.vastaaTupu();
+		as1.lisaaId();
+		as2.lisaaId();
+		as3.lisaaId();
+		as4.lisaaId();
+		
+		try {
+			asukkaat.lisaa(as1);
+			asukkaat.lisaa(as2);
+			asukkaat.lisaa(as3);
+			asukkaat.poista(as2.getId(), asukkaat.getLkm());
+			asukkaat.lisaa(as4);
+			
+			System.out.println("============= J‰senet testi =================");
+			
+			for(int i = 0; i < asukkaat.getLkm(); i++) {
+				Asukas asukas = asukkaat.anna(i);
+				System.out.println("Asukkaan numero: " + i);
+				asukas.tulosta(System.out);
+			}
+			
+		} catch (SailoException ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+}

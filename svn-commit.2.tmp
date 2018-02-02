@@ -1,0 +1,6 @@
+parmpi
+--This line, and those below, will be ignored--
+
+M    src/KamppistenKotityotGUI/KamppistenKotityotController.java
+M    src/KamppistenKotityotKamppistenKotityot/KamppistenKotityot.java
+M    src/KamppistenKotityotKotityot/Kotityot.java

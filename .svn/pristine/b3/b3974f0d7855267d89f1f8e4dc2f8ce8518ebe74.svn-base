@@ -1,0 +1,96 @@
+package KamppistenKotityotGUI;
+
+import javafx.fxml.FXML;
+import fi.jyu.mit.fxgui.*;
+
+
+/**
+ * Controller tiedosto KamppistenKotityotGUI ohjelmalle.
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 4.2.2016
+ *
+ */
+public class KamppistenKotityotController {
+    @FXML void handleLisaaAsukas() {
+        lisaaAsukas();
+    }
+
+    @FXML void handleLisaaKotityo() {
+        lisaaKotityo();
+    }
+
+    @FXML void handleMerkitseTehdyksi() {
+        merkitseTehdyksi();
+    }
+
+    @FXML void handleMerkitseTekijaksi() {
+        merkitseTekijaksi();
+    }
+
+    @FXML private void handlePoistaAsukas() {
+        poistaAsukas();
+    }
+
+    @FXML void handlePoistaKotityo() {
+        poistaKotityo();
+    }
+    
+    
+    /**
+     * Avaa ikkunan asukkaan lisäämiseksi.
+     */
+    private void lisaaAsukas() {
+        String lisaaAsukas = Dialogs.showInputDialog("Lisättävän asukkaan nimi", "");
+        if (lisaaAsukas == null) return;
+        Dialogs.showMessageDialog("Ei osata vielä lisätä asukasta");
+    }
+    
+    
+    /**
+     * Avaa ikkunan kotityön lisäämiseksi.
+     */
+    private void lisaaKotityo() {
+        String lisaaKotityo = Dialogs.showInputDialog("Lisättävä kotityo", "");
+        if (lisaaKotityo == null) return;
+        Dialogs.showMessageDialog("Ei osata vielä lisätä kotityötä");
+    }
+    
+    
+    /**
+     * Siirtää valitun työn edellisiin kertoihin ja siirtää edellisillä kerroilla 
+     * tehtyjä töitä yhden taaksepäin.
+     */
+    private void merkitseTehdyksi() {
+        Dialogs.showMessageDialog("Ei osata vielä merkitä tehdyksi");
+    }
+
+    
+    /**
+     * Merkitsee valitun asukkaan valitun kotityön tekijäksi.
+     */
+    private void merkitseTekijaksi() {
+        Dialogs.showMessageDialog("Ei osata vielä merkitä tekijää");
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun asukkaan poiston varmistamiseksi. 
+     */
+    private void poistaAsukas() {
+        boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa asukkaan Tupu", "Kyllä", "Peruuta");
+        if (vastaus == true) Dialogs.showMessageDialog("Ei osata poistaa asukasta");
+        return;
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun kotityön poiston varmistamiseksi.
+     */
+    private void poistaKotityo() {
+        boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa kotityön vessan siivous", "Kyllä", "Peruuta");
+        if (vastaus == true) Dialogs.showMessageDialog("Ei osata poistaa kotityötä");
+        return;
+    }
+}

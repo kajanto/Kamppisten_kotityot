@@ -1,0 +1,59 @@
+package KamppistenKotityotKotityot;
+
+import java.util.*;
+
+/**
+ * Luokka, joka hallitsee kotityö-rekisteriä
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 21.3.2016
+ *
+ */
+public class Kotityot {
+
+    private final Collection<Kotityo> kotityot = new ArrayList<Kotityo>();
+    private String tiedostonNimi = "";
+    
+//    /**
+//     * Iteraattori kotitöiden läpikäymiseen
+//     * @return kotityoiteraattori
+//     */
+//    public Iterator<Kotityo> iterator() {
+//        return kotityot.iterator();
+//    }
+    
+    /**
+     * Muodostaja. Kotityot alustus.
+     */
+    public Kotityot() {
+        //Ei vielä mitään
+    }
+    
+    
+    /**
+     * @param kt lisättävä kotityö
+     */
+    public void lisaaKotityo(Kotityo kt) {
+        kotityot.add(kt);
+    }
+    
+    
+    
+    /**
+     * @param hakemisto tiedoston hakemisto
+     * @throws SailoException jos tiedoston lukeminen epäonnistuu
+     */
+    public void lueTiedostosta(String hakemisto) {
+        tiedostonNimi = hakemisto + ".har";
+        throw new SailoException("Ei osata vielä lukea tiedostoa " + tiedostonNimi);
+    }
+    
+    
+    /**
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    
+    }
+
+}

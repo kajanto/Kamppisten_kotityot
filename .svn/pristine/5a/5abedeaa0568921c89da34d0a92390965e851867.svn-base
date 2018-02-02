@@ -1,0 +1,152 @@
+package KamppistenKotityotKotityot;
+
+import java.util.*;
+import KamppistenKotityotAsukkaat.SailoException;
+
+/**
+ * Luokka, joka hallitsee kotityö-rekisteriä
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 21.3.2016
+ *
+ */
+public class Kotityot implements Iterable<Kotityo> {
+
+    private final Collection<Kotityo> kotityot = new ArrayList<Kotityo>();
+    private String tiedostonNimi = "";
+    
+    
+    /**
+     * Muodostaja. Kotityot alustus.
+     */
+    public Kotityot() {
+        //Ei vielä mitään
+    }
+    
+    
+    /**
+     * Lisää kotityön
+     * @param kt lisättävä kotityö
+     */
+    public void lisaaKotityo(Kotityo kt) {
+        kotityot.add(kt);
+        kt.kasvataId();
+    }
+    
+    
+    /**
+     * Poistaa kotityön.
+     * @param kt poistettava kotityo
+     */
+    public void poistaKotityo(Kotityo kt) {
+        kotityot.remove(kt);
+    }
+
+
+    /**
+     * @param hakemisto tiedoston hakemisto
+     * @throws SailoException jos tiedoston lukeminen epäonnistuu
+     */
+    public void lueTiedostosta(String hakemisto) throws SailoException {
+        tiedostonNimi = hakemisto + ".kot";
+        throw new SailoException("Ei osata vielä lukea tiedostoa " + tiedostonNimi);
+    }
+    
+    
+    /**
+     * Tallentaa jäsenistön tiedostoon.  
+     * TODO Kesken.
+     * @throws SailoException jos talletus epäonnistuu
+     *
+     */
+    public void talleta() throws SailoException {
+        throw new SailoException("Ei osata vielä tallettaa tiedostoa " + tiedostonNimi);
+    }
+    
+    
+    /**
+     * Palauttaa KamppistenKotityot Kotitöiden lukumäärän
+     * @return Kotitöiden lukumäärä
+     */
+    public int getLkm() {
+        return kotityot.size();
+    }
+
+
+    /**
+     * Iteraattori kaikkien kotitöiden läpikäymiseen
+     * @return kotityoiteraattori
+     */
+    @Override
+    public Iterator<Kotityo> iterator() {
+        return kotityot.iterator();
+    }
+        
+    
+    /**
+     * Haetaan kaikki kotityöt
+     * @return tietorakenne jossa viiteet löydetteyihin kotitöihin
+     * @example
+     * <pre name="test">
+     * #import java.util.*;
+     * #import KamppistenKotityotKotityot.Kotityo;
+     *  Kotityot kt = new Kotityot();
+     *  Kotityo kt1 = new Kotityo("Imurointi"); kt.lisaaKotityo(kt1);
+     *  Kotityo kt2 = new Kotityo("Vessan pesu"); kt.lisaaKotityo(kt2);
+     *  Kotityo kt3 = new Kotityo("Roskien vienti"); kt.lisaaKotityo(kt3);
+     *  Kotityo kt4 = new Kotityo("Olohuoneen siivous"); kt.lisaaKotityo(kt4);
+     *  Kotityo kt5 = new Kotityo("Koiran ulkoilutus"); kt.lisaaKotityo(kt5);
+     *  Kotityo kt6 = new Kotityo("Pölyjen pyyhintä"); kt.lisaaKotityo(kt6);
+     *  
+     *  List<Kotityo> loytyneet;
+     *  loytyneet = kt.annaKotityot();
+     *  loytyneet.size() === 6; 
+     *  loytyneet.get(0) == kt1 === true;
+     *  loytyneet.get(1) == kt2 === true;
+     * </pre> 
+     */
+    public List<Kotityo> annaKotityot() {
+        List<Kotityo> loydetyt = new ArrayList<Kotityo>();
+        for (Kotityo kt : kotityot)
+            loydetyt.add(kt);
+        return loydetyt;
+    }
+    
+    
+    /**
+     * Etsii kotityölistasta parametrina tuodun viitenumeron omaavan kotityön. Jos kyseistä 
+     * kotityötä ei löydy, palauttaa -1.
+     * @param id kotityön viitenumero
+     * @return indeksi missä haluttu kotityö listalla sijaitsee
+     */
+    public int moneskoKotityo(int id) {
+        for(int i = 0; i < kotityot.size(); i++) {
+            if(this.annaKotityot().get(i).getId() == id) return i;
+        }
+        return -1;
+    }
+        
+    
+    /**
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+        System.out.println("==============================Kotityot Testi==============================");
+        Kotityot ktt = new Kotityot();
+        Kotityo kt1 = new Kotityo("Vessan siivous", 1);
+        Kotityo kt2 = new Kotityo("Imurointi");
+        Kotityo kt3 = new Kotityo("Roskien vieminen", 2, 5, 2);
+        ktt.lisaaKotityo(kt1);
+        ktt.lisaaKotityo(kt2);
+        ktt.lisaaKotityo(kt3);
+        for (Kotityo kt : ktt) {
+            kt.tulosta(System.out);
+        }
+        Kotityo kt4 = new Kotityo("Koiran ulkoilutus", 3, 4);
+        ktt.poistaKotityo(kt2);
+        ktt.lisaaKotityo(kt4);
+        System.out.println();
+        for (Kotityo kt : ktt) {
+            kt.tulosta(System.out);
+        }
+    }
+}

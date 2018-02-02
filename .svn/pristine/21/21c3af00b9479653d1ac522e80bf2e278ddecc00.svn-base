@@ -1,0 +1,316 @@
+package KamppistenKotityotKotityot;
+
+import java.io.PrintStream;
+
+import fi.jyu.mit.ohj2.Mjonot;
+
+/**
+ * Luokka, joka hallitsee yksittäisen kotityöhön liittyviä asioita. Kotityö pitää yllä omaa nimeään, sekä sitä kuka
+ * on seuraavana vuorossa ja enintään kolmea edellistä kertaa. Vuoron arvona on -1 kun silloista kertaa ei ole allokoitu
+ * kenellekkään.
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 21.3.2016 Aloitus
+ * @version 28.3.2016 Lisättiin muodostajat ja kaikki aliohjelmat
+ *
+ */
+public class Kotityo {
+    private int id = 0;
+    private String kotityonNimi;
+    private int seuraavanaVuorossa = -1;
+    private int edellinenKerta = -1;
+    private int sitaEdeltava = -1;
+    private int toistaEdeltava = -1;
+    
+    private static int seuraavaId = 1;
+
+    
+    
+    /**
+     * Muodostaja kun kaikki edelliset kerrat tiedetään.
+     * @param kotityonNimi Kotityön nimi
+     * @param seuraavanaVuorossa seuraavana vuorossa olevan asukkaan id 
+     * @param edellinenKerta edeltävän vuorossa olevan asukkaan id
+     * @param sitaEdeltava sitä edeltävän vuorossa olevan asukkaan id
+     * @param toistaEdeltava toista edeltävän vuorossa olevan asukkaan id
+     */
+    public Kotityo(String kotityonNimi, int seuraavanaVuorossa, int edellinenKerta, int sitaEdeltava, int toistaEdeltava) {
+        this.kotityonNimi = kotityonNimi;
+        this.setSeuraavanaVuorossa(seuraavanaVuorossa);
+        this.setEdellinenKerta(edellinenKerta);
+        this.setSitaEdeltava(sitaEdeltava);
+        this.setToistaEdeltava(toistaEdeltava);
+    }
+
+    
+    /**
+     * Muodostaja kun kaikki paitsi toistaEdeltava tiedetään.
+     * @param kotityonNimi Kotityön nimi
+     * @param seuraavanaVuorossa seuraavana vuorossa olevan asukkaan id 
+     * @param edellinenKerta edeltävän vuorossa olevan asukkaan id
+     * @param sitaEdeltava sitä edeltävän vuorossa olevan asukkaan id
+     */
+    public Kotityo(String kotityonNimi, int seuraavanaVuorossa, int edellinenKerta, int sitaEdeltava) {
+        this.kotityonNimi = kotityonNimi;
+        this.setSeuraavanaVuorossa(seuraavanaVuorossa);
+        this.setEdellinenKerta(edellinenKerta);
+        this.setSitaEdeltava(sitaEdeltava);
+    }
+
+    
+    /**
+     * Muodostaja kun kaikki paitsi sitaEdeltava ja toistaEdeltava tiedetään.
+     * @param kotityonNimi Kotityön nimi
+     * @param seuraavanaVuorossa seuraavana vuorossa olevan asukkaan id 
+     * @param edellinenKerta edeltävän vuorossa olevan asukkaan id
+     */
+    public Kotityo(String kotityonNimi, int seuraavanaVuorossa, int edellinenKerta) {
+        this.kotityonNimi = kotityonNimi;
+        this.setSeuraavanaVuorossa(seuraavanaVuorossa);
+        this.setEdellinenKerta(edellinenKerta);
+    }
+
+    
+    /**
+     * Muodostaja kun kaikki paitsi edellinenKerta, sitaEdeltava ja toistaEdeltava tiedetään.
+     * @param kotityonNimi Kotityön nimi
+     * @param seuraavanaVuorossa seuraavana vuorossa olevan asukkaan id
+     */
+    public Kotityo(String kotityonNimi, int seuraavanaVuorossa) {
+        this.kotityonNimi = kotityonNimi;
+        this.setSeuraavanaVuorossa(seuraavanaVuorossa);
+    }
+    
+    
+    /**
+     * 
+     * Oletusmuodostaja, kun luodaan kotitöitä.
+     * @param kotityonNimi kotityön nimi
+     */
+    public Kotityo(String kotityonNimi) {
+        this.kotityonNimi = kotityonNimi;
+    }
+    
+    
+    /**
+     * Alustetaan kotityo
+     */
+    public Kotityo() {
+        //
+    }
+    
+    
+    /**
+     * Get metodi kotityön id:lle
+     * @return kotityon id
+     */
+    public int getId() {
+        return id;
+    }
+    
+    
+    /**
+     * Kasvattaa id:tä niin että kotitöille tulee juokseva id 
+     * @return kasvatettu id
+     * @example
+     * <pre name="test">
+     * Kotityo kt1 = new Kotityo("Imurointi");
+     * kt1.kasvataId();
+     * Kotityo kt2 = new Kotityo("Vessan siivous");
+     * kt2.kasvataId();
+     * kt1.getId() === 1;
+     * kt2.getId() === 2;
+     * </pre>
+     */
+    public int kasvataId() {
+        id = seuraavaId;
+        seuraavaId++;
+        return id;
+    }
+    
+    
+    /**
+     * Palauttaa kotityön nimen
+     * @return kotityön nimi
+     * @example
+     * <pre name="test">
+     * String nimi = "Vessapaperin hankinta";
+     * Kotityo kt1 = new Kotityo(nimi);
+     * kt1.getKotityonNimi() === "Vessapaperin hankinta";
+     * </pre>
+     */
+    public String getKotityonNimi() {
+        return kotityonNimi;
+    }
+    
+    
+    
+    /**
+     * Palauttaa kuka on seuraavana vuorossa.
+     * @return seuraavana vuorossa olevan asukkaan id
+     * @example
+     * <pre name="test">
+     * Kotityo kt1 = new Kotityo("Tiskaus", 1, 4, 3, 2);
+     * kt1.getSeuraavanaVuorossa() === 1;
+     * Kotityo kt2 = new Kotityo("Tiskaus");
+     * kt2.getSeuraavanaVuorossa() === -1;
+     * </pre>
+     */
+    public int getSeuraavanaVuorossa() {
+        return seuraavanaVuorossa;
+    }
+    
+    
+    /**
+     * Asettaa seuraavanaVuorossa arvon
+     * @param seuraavanaVuorossa arvo joka asetetaan
+     */
+    public void setSeuraavanaVuorossa(int seuraavanaVuorossa) {
+        this.seuraavanaVuorossa = seuraavanaVuorossa;
+    }
+
+
+    /**
+     * Palauttaa kuka oli edellisen kerran vuorossa.
+     * @return edellisenä vuorossa olleen asukkaan id
+     * @example
+     * <pre name="test">
+     * Kotityo kt1 = new Kotityo("Roskien vienti", 4, 2, 4, 1);
+     * kt1.getEdellinenKerta() === 2;
+     * Kotityo kt2 = new Kotityo("Roskien vienti", 4);
+     * kt2.getEdellinenKerta() === -1;
+     * </pre>
+     */
+    public int getEdellinenKerta() {
+        return edellinenKerta;
+    }    
+    
+    
+    /**
+     * Asettaa edellinenKerta arvon
+     * @param edellinenKerta arvo joka asetetaan
+     */
+    public void setEdellinenKerta(int edellinenKerta) {
+        this.edellinenKerta = edellinenKerta;
+    }
+
+
+    /**
+     * Palauttaa kuka oli sitä edeltävän kerran vuorossa.
+     * @return sitä edeltävänä olleen asukkaan id
+     * @example
+     * <pre name="test">
+     * Kotityo kt1 = new Kotityo("WC:n pesu", 1, 2, 3, 4);
+     * kt1.getSitaEdeltava() === 3;
+     * Kotityo kt2 = new Kotityo("WC:n pesu", 1, 2);
+     * kt2.getSitaEdeltava() === -1;
+     * </pre>
+     */
+    public int getSitaEdeltava() {
+        return sitaEdeltava;
+    }
+    
+    
+    /**
+     * Asettaa sitaEdeltava arvon
+     * @param sitaEdeltava arvo joka asetetaan
+     */
+    public void setSitaEdeltava(int sitaEdeltava) {
+        this.sitaEdeltava = sitaEdeltava;
+    }
+
+
+    /**
+     * Palauttaa kuka oli toista edeltävän kerran vuorossa.
+     * @return toista edeltävänä olleen asukkaan id
+     * @example
+     * <pre name="test">
+     * Kotityo kt1 = new Kotityo("imurointi", 1, 3, 3, 2);
+     * kt1.getToistaEdeltava() === 2;
+     * Kotityo kt2 = new Kotityo("imurointi", 1, 3, 3);
+     * kt2.getToistaEdeltava() === -1;
+     * </pre>
+     */
+    public int getToistaEdeltava() {
+        return toistaEdeltava;
+    }
+
+
+    /**
+     * Asettaa toistaEdeltava arvon
+     * @param toistaEdeltava arvo joka asetetaan
+     */
+    public void setToistaEdeltava(int toistaEdeltava) {
+        this.toistaEdeltava = toistaEdeltava;
+    }
+    
+    
+    /**
+     * Asettaa tunnusnumeron ja samalla varmistaa että
+     * seuraava numero on aina suurempi kuin tähän mennessä suurin.
+     * @param nr asetettava tunnusnumero
+     */
+    private void setId(int nr) {
+        id = nr;
+        if (id >= seuraavaId) seuraavaId = id + 1;
+    }
+    
+    
+    /**
+     * Kuinka Kotityo-olio muutetaan String tyyppiseksi.
+     * @example
+     * <pre name="test">
+     * Kotityo kt1 = new Kotityo("Imurointi", 1, 3, 2, 1);
+     * kt1.toString() === "0|Imurointi|1|3|2|1";
+     * </pre>
+     */
+    @Override
+    public String toString() {
+        return this.getId() + "|" + kotityonNimi + "|" + this.getSeuraavanaVuorossa() + "|" + 
+                this.getEdellinenKerta() + "|" + this.getSitaEdeltava() + "|" + 
+                this.getToistaEdeltava();
+    }
+    
+    
+    /**
+     * Parsii |-merkkejä sisältävästä merkkijonosta kotityo-olion
+     * @param rivi merkkijono josta kotityo parsitaan
+     * @example
+     * <pre name="test">
+     * Kotityo kt = new Kotityo();
+     * kt.parse("  2| Imurointi  | 2 | 1   |2| 1");
+     * kt.getId() === 2;
+     * kt.toString() === "2|Imurointi|2|1|2|1";
+     * </pre>
+     */
+    public void parse(String rivi) {
+        StringBuffer sb = new StringBuffer(rivi);
+        setId(Mjonot.erota(sb, '|', getId()));
+        kotityonNimi = Mjonot.erota(sb, '|', getKotityonNimi());
+        setSeuraavanaVuorossa(Mjonot.erota(sb, '|', getSeuraavanaVuorossa()));
+        setEdellinenKerta(Mjonot.erota(sb, '|', getEdellinenKerta()));
+        setSitaEdeltava(Mjonot.erota(sb, '|', getSitaEdeltava()));
+        setToistaEdeltava(Mjonot.erota(sb, '|', getToistaEdeltava()));
+    }
+    
+    
+    /**
+     * Tulostaa Kotityo-olion haluttuun tietovirtaan.
+     * @param out Tietovirta johon tulostetaan.
+     */
+    public void tulosta(PrintStream out) {
+        out.println(this);
+    }
+    
+    
+    /**
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+        Kotityo imurointi = new Kotityo("Imurointi", 1, 4, 2, 3);
+        imurointi.tulosta(System.out);
+        Kotityo kt = new Kotityo();
+        kt.parse(" 3| Vessan pesu| 2  | 1|");
+        kt.tulosta(System.out);
+    }
+
+}

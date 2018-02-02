@@ -1,0 +1,16 @@
+﻿+--------------------------------------+--------------------------------------+
+| Luokan nimi: Kotityo                 | Avustajat:                           |
++--------------------------------------+--------------------------------------+
+| Vastuualueet:                        |                                      |
+|                                      |                                      |
+| - tietää kotityön nimen ja kenelle   |                                      |
+|   se on aikaisemmilla kerroilla      |                                      |
+|   asetettu                           |									  |
+|                                      |                                      |
+| - osaa tarkistaa tietyn kentän       |                                      |
+| oikeellisuuden (syntaksin)           |                                      |
+|                                      |                                      |
+| - osaa antaa merkkijonona kotityön   |                                      |
+| tiedot                               |                                      |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+

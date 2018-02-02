@@ -1,0 +1,16 @@
+﻿+--------------------------------------+--------------------------------------+
+| Luokan nimi: KamppistenKotityot      | Avustajat:                           |
++--------------------------------------+--------------------------------------+
+| Vastuualueet:                        |  -Asukas                             |
+|                                      |                                      |
+| - hoitaa Asukkaat- ja Kotityot-      |  -Asukkaat                           |
+|   luokkien välisen yhteistyön        |                                      |
+|   ja tiedon välityksen ja muun       |  -Kotityo                            |
+|   muuassa kotitöiden allokoinnin     |                                      |
+|									   |  -Kotityot	      					  |	
+| - hoitaa KamppistenKotityot-         |                                      |
+|   tiedostoon kirjoituksen ja sen     |                                      |
+|   luvun                              |                                      |
+|                                      |                                      |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+

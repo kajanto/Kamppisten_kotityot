@@ -1,0 +1,495 @@
+package kamppistenKotityot;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+/**
+ * Asukasluettelo, joka voi lis‰t‰ ja poistaa asukkaita.
+ * @author Juho Kajanto & Tomi Nyyssˆnen
+ *   juho_kajanto@hotmail.com
+ *   toalnyys@student.jyu.fi
+ * @version 28.3.2016
+ */
+public class Asukkaat implements Iterable<Asukas>{
+	private static int MAX_ASUKKAITA = 10;
+	private int        lkm           = 0;
+	private boolean muutettu = false;
+	private String     tiedostonPerusNimi = "nimet";
+	private Asukas     alkiot[]      = new Asukas[MAX_ASUKKAITA];
+	
+	/**
+	 * Oletusmuodostaja
+	 */
+	public Asukkaat() {
+		//Attribuuttien oma alustus riitt‰‰
+	}
+	
+	
+	/**
+	 * Get-metodi alkiot taulukolle, jotta taulukon koon kasvattaminen voidaan testata.
+	 * @return palauttaa alkiot taulukon
+	 */
+	public Asukas[] getAlkiot() {
+	    return alkiot;
+	}
+	
+	
+	/**
+	 * Lis‰‰ uuden asukkaan tietorakenteeseen. Jos ylitt‰‰ t‰m‰n hetkisen maksimikoon, kopioi alkiot
+	 * uuteen suurennettuun taulukkoon ja siirt‰‰ alkiot taulukon viitteen siihen.
+	 * @param asukas lis‰tt‰v‰n asukkaan viite
+	 * @example
+	 * <pre name="test">
+	 * Asukkaat asukkaat = new Asukkaat();
+	 * Asukas as1 = new Asukas(); Asukas as2 = new Asukas();
+	 * asukkaat.getLkm() === 0;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as2);
+	 * asukkaat.getLkm() === 2;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.getLkm() === 3;
+	 * asukkaat.anna(0) === as1;
+	 * asukkaat.anna(1) === as2;
+	 * asukkaat.anna(2) === as1;
+	 * asukkaat.anna(3) === as1; #THROWS IndexOutOfBoundsException
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.getLkm() === 10;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.getLkm() === 11;
+	 * asukkaat.getAlkiot().length === 20;
+	 * </pre>
+	 */
+	public void lisaa(Asukas asukas) {
+		if (lkm >= alkiot.length) {
+		    MAX_ASUKKAITA += 10;
+		    Asukas[] suurennettu = new Asukas[MAX_ASUKKAITA];
+		    for (int i = 0; i < alkiot.length; i++) {
+		        suurennettu[i] = alkiot[i];
+		    }
+		    alkiot = suurennettu;
+		}
+		alkiot[lkm] = asukas;
+		lkm++;
+		
+		muutettu = true;
+	}
+	
+	/**
+	 * Poistaa asukkaan tietorakenteesta
+	 * @param as poistettava asukas
+	 * @throws SailoException jos tietorakenne on tyhj‰
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException
+	 * Asukkaat asukkaat = new Asukkaat();
+	 * Asukas as1 = new Asukas(); Asukas as2 = new Asukas(); Asukas as3 = new Asukas();
+	 * as1.lisaaId(); as2.lisaaId(); as3.lisaaId();
+	 * asukkaat.getLkm() === 0;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as2);
+	 * asukkaat.lisaa(as3);
+	 * asukkaat.getLkm() === 3;
+	 * asukkaat.poista(as2);
+	 * asukkaat.getLkm() === 2;
+	 * asukkaat.anna(0) === as1;
+	 * asukkaat.anna(1) === as3;
+	 * asukkaat.anna(2) === as3; #THROWS IndexOutOfBoundsException
+	 * </pre>
+	 */
+	public void poista(Asukas as) throws SailoException {
+		int n = etsiPaikka(as.getId());
+		if (n >= alkiot.length) throw new SailoException("Liian v‰h‰n alkioita!");
+		for (int j = n+1; j < alkiot.length; j++, n++) {
+			alkiot[n] = alkiot[j];
+			alkiot[j] = null;
+		}
+		lkm--;
+		
+		muutettu = true;
+	}
+	
+	/**
+	 * Etsii etsityn asukkaan paikan taulukossa viitenumeron perusteella
+	 * @param id asukkaan viitenumero
+	 * @return asukkaan paikka taulukossa
+	 * @throws SailoException jos asukasta ei lˆydy
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException
+	 * Asukkaat asukkaat = new Asukkaat();
+	 * Asukas as1 = new Asukas(); Asukas as2 = new Asukas(); Asukas as3 = new Asukas();
+	 * as1.lisaaId(); as2.lisaaId(); as3.lisaaId();
+	 * asukkaat.getLkm() === 0;
+	 * asukkaat.lisaa(as1);
+	 * asukkaat.lisaa(as2);
+	 * asukkaat.lisaa(as3);
+	 * asukkaat.getLkm() === 3;
+	 * asukkaat.etsiPaikka(as1.getId()) === 0;
+	 * asukkaat.etsiPaikka(as2.getId()) === 1;
+	 * asukkaat.etsiPaikka(as3.getId()) === 2;
+	 * asukkaat.poista(as2);
+	 * asukkaat.etsiPaikka(as1.getId()) === 0;
+	 * asukkaat.etsiPaikka(as2.getId()) === 1; #THROWS SailoException
+	 * asukkaat.etsiPaikka(as3.getId()) === 1;
+	 * </pre>
+	 */
+	public int etsiPaikka(int id) throws SailoException {
+		for(int i = 0; i<lkm; i++) {
+			if (alkiot[i].getId() == id) return i;
+		}
+		throw new SailoException("Asukasta ei lˆydy!");
+	}
+	
+	/**
+	 * Palauttaa viitteen haluttuun asukkaaseen
+	 * @param i halutun asukkaan j‰rjestysnumero
+	 * @return viite i:teen asukkaaseen
+	 * @throws IndexOutOfBoundsException jos i laittomalla alueella
+	 */
+	public Asukas anna(int i) throws IndexOutOfBoundsException {
+		if (i < 0 || lkm <= i) throw new IndexOutOfBoundsException("Laiton indeksi: " + i);
+		return alkiot[i];
+	}
+	
+	
+    /** 
+     * Palauttaa "taulukossa" hakuehtoon vastaavien asukkaiden viitteet
+     * @return tietorakenteen lˆytyneist‰ j‰senist‰ 
+     * @example 
+     * <pre name="test"> 
+     * #THROWS SailoException  
+     *   Asukkaat asukkaat = new Asukkaat(); 
+     *   Asukas asukas1 = new Asukas(); asukas1.parse("1|Tupu"); 
+     *   Asukas asukas2 = new Asukas(); asukas2.parse("2|Lupu"); 
+     *   Asukas asukas3 = new Asukas(); asukas3.parse("3|Hupu"); 
+     *   Asukas asukas4 = new Asukas(); asukas4.parse("4|Leenu"); 
+     *   Asukas asukas5 = new Asukas(); asukas5.parse("5|Liinu"); 
+     *   asukkaat.lisaa(asukas1); 
+     *   asukkaat.lisaa(asukas2); 
+     *   asukkaat.lisaa(asukas3); 
+     *   asukkaat.lisaa(asukas4); 
+     *   asukkaat.lisaa(asukas5);
+     *   
+     *  Collection<Asukas> loytyneet;
+     *  loytyneet = asukkaat.annaAsukkaat();
+     *  loytyneet.size() === 5; 
+     *  loytyneet.toArray()[0] == asukas1 === true;
+     *  loytyneet.toArray()[1] == asukas2 === true;
+     * </pre> 
+     */
+    public Collection<Asukas> annaAsukkaat() { 
+        Collection<Asukas> loytyneet = new ArrayList<Asukas>(); 
+        for (Asukas asukas : this) { 
+            loytyneet.add(asukas);  
+        } 
+        return loytyneet; 
+    }
+	
+	
+	/**
+	 * Palauttaa asukkaiden lukum‰‰r‰n
+	 * @return asukkaiden lukum‰‰r‰
+	 */
+	public int getLkm() {
+		return lkm;
+	}
+	
+	/**
+     * Palauttaa tiedoston nimen, jota k‰ytet‰‰n tallennukseen
+     * @return tallennustiedoston nimi
+     */
+    public String getTiedostonPerusNimi() {
+        return tiedostonPerusNimi;
+    }
+	
+    /**
+     * Asettaa tiedoston perusnimen ilman tarkenninta
+     * @param nimi tallennustiedoston perusnimi
+     */
+    public void setTiedostonPerusNimi(String nimi) {
+        tiedostonPerusNimi = nimi;
+    }
+
+
+    /**
+     * Palauttaa tiedoston nimen, jota k‰ytet‰‰n tallennukseen
+     * @return tallennustiedoston nimi
+     */
+    public String getTiedostonNimi() {
+        return getTiedostonPerusNimi() + ".dat";
+    }
+
+
+    /**
+     * Palauttaa varakopiotiedoston nimen
+     * @return varakopiotiedoston nimi
+     */
+    public String getBakNimi() {
+        return tiedostonPerusNimi + ".bak";
+    }
+    
+	/**
+	 * Lukee asukasluettelon tiedostosta
+	 * @param tied tiedoston perusnimi
+	 * @throws SailoException jos tiedoston lukeminen ei onnistu
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException 
+     * #import java.io.File;
+     * #import kamppistenKotityot.SailoException;
+     * Asukkaat asukkaat = new Asukkaat();
+     * Asukas tupu1 = new Asukas(), tupu2 = new Asukas();
+     * tupu1.vastaaTupu();
+     * tupu2.vastaaTupu();
+     * String tiedNimi = "testiNimet";
+     * File ftied = new File(tiedNimi+".dat");
+     * ftied.delete();
+     * asukkaat.lueTiedostosta(tiedNimi); #THROWS SailoException
+     * asukkaat.lisaa(tupu1);
+     * asukkaat.lisaa(tupu2);
+     * asukkaat.tallenna();
+     * asukkaat = new Asukkaat();
+     * asukkaat.lueTiedostosta(tiedNimi);
+     * Iterator<Asukas> i = asukkaat.iterator();
+     * i.next().toString() === tupu1.toString();
+     * i.next().toString() === tupu2.toString();
+     * i.hasNext() === false;
+     * asukkaat.lisaa(tupu2);
+     * asukkaat.tallenna();
+     * ftied.delete() === true;
+     * File fbak = new File(tiedNimi+".bak");
+     * fbak.delete() === true;
+	 * </pre>
+	 */
+	public void lueTiedostosta(String tied) throws SailoException {
+		setTiedostonPerusNimi(tied);
+		try ( BufferedReader fi = new BufferedReader(new FileReader(getTiedostonNimi())) ) {
+			String rivi;
+			while ( (rivi = fi.readLine()) != null ) {
+                rivi = rivi.trim();
+                if ( "".equals(rivi) ) continue;
+                Asukas asukas = new Asukas();
+                asukas.parse(rivi); // voisi olla virhek‰sittely
+                lisaa(asukas);
+			}
+			
+		} catch ( FileNotFoundException e ) {
+			throw new SailoException("Tiedosto " + getTiedostonNimi() + " ei aukea");			
+		} catch ( IOException e ) {
+            throw new SailoException("Ongelmia tiedoston kanssa: " + e.getMessage());
+        }
+		
+		muutettu = false;
+	}
+	
+	/**
+     * Luetaan aikaisemmin annetun nimisest‰ tiedostosta
+     * @throws SailoException jos tulee poikkeus
+     */
+    public void lueTiedostosta() throws SailoException {
+        lueTiedostosta(getTiedostonPerusNimi());
+    }
+	
+	/**
+	 * Tallentaa  asukasluettelon tiedostoon
+	 * @throws SailoException jos tallentaminen ei onnistu
+	 * @example
+	 * <pre name="test">
+	 * 
+	 * </pre>
+	 */
+	public void tallenna() throws SailoException {
+		if ( !muutettu ) return;
+
+        File fbak = new File(getBakNimi());
+        File ftied = new File(getTiedostonNimi());
+        fbak.delete(); // if .. System.err.println("Ei voi tuhota");
+        ftied.renameTo(fbak); // if .. System.err.println("Ei voi nimet‰");
+
+        try ( PrintWriter fo = new PrintWriter(new FileWriter(ftied.getCanonicalPath())) ) {
+            for (Asukas asukas : this) {
+                fo.println(asukas.toString());
+            }
+            //} catch ( IOException e ) { // ei heit‰ poikkeusta
+            //  throw new SailoException("Tallettamisessa ongelmia: " + e.getMessage());
+        } catch ( FileNotFoundException ex ) {
+            throw new SailoException("Tiedosto " + ftied.getName() + " ei aukea");
+        } catch ( IOException ex ) {
+            throw new SailoException("Tiedoston " + ftied.getName() + " kirjoittamisessa ongelmia");
+        }
+
+        muutettu = false;
+	}
+	
+	
+	/**
+	 * Luokka asukkaiden iteroimiseksi
+	 * @example
+	 * <pre name="test">
+	 * #THROWS SailoException 
+     * #PACKAGEIMPORT
+     * #import java.util.*;
+     * 
+     * Asukkaat asukkaat = new Asukkaat();
+     * Asukas tupu1 = new Asukas(), tupu2 = new Asukas();
+     * tupu1.lisaaId(); tupu2.lisaaId();
+     *
+     * asukkaat.lisaa(tupu1); 
+     * asukkaat.lisaa(tupu2); 
+     * asukkaat.lisaa(tupu1); 
+     * 
+     * StringBuffer ids = new StringBuffer(30);
+     * for (Asukas asukas:asukkaat)   // Kokeillaan for-silmukan toimintaa
+     *   ids.append(" "+asukas.getId());           
+     * 
+     * String tulos = " " + tupu1.getId() + " " + tupu2.getId() + " " + tupu1.getId();
+     * 
+     * ids.toString() === tulos; 
+     * 
+     * ids = new StringBuffer(30);
+     * for (Iterator<Asukas>  i=asukkaat.iterator(); i.hasNext(); ) { // ja iteraattorin toimintaa
+     *   Asukas asukas = i.next();
+     *   ids.append(" "+asukas.getId());           
+     * }
+     * 
+     * ids.toString() === tulos;
+     * 
+     * Iterator<Asukas>  i=asukkaat.iterator();
+     * i.next() == tupu1  === true;
+     * i.next() == tupu2  === true;
+     * i.next() == tupu1  === true;
+     * 
+     * i.next();  #THROWS NoSuchElementException
+	 * </pre>
+	 */
+	public class AsukkaatIterator implements Iterator<Asukas> {
+        private int kohdalla = 0;
+
+
+        /**
+         * Onko olemassa viel‰ seuraavaa j‰sent‰
+         * @see java.util.Iterator#hasNext()
+         * @return true jos on viel‰ j‰seni‰
+         */
+        @Override
+        public boolean hasNext() {
+            return kohdalla < getLkm();
+        }
+
+
+        /**
+         * Annetaan seuraava j‰sen
+         * @return seuraava j‰sen
+         * @throws NoSuchElementException jos seuraava alkiota ei en‰‰ ole
+         * @see java.util.Iterator#next()
+         */
+        @Override
+        public Asukas next() throws NoSuchElementException {
+            if ( !hasNext() ) throw new NoSuchElementException("Ei oo");
+            return anna(kohdalla++);
+        }
+
+
+        /**
+         * Tuhoamista ei ole toteutettu
+         * @throws UnsupportedOperationException aina
+         * @see java.util.Iterator#remove()
+         */
+        @Override
+        public void remove() throws UnsupportedOperationException {
+            throw new UnsupportedOperationException("Me ei poisteta");
+        }
+    }
+	
+	
+	/**
+     * Palautetaan iteraattori asukaistaan.
+     * @return asukas iteraattori
+     */
+    @Override
+    public Iterator<Asukas> iterator() {
+        return new AsukkaatIterator();
+    }
+	
+	
+	/**
+	 * Testiohjelma Asukkaille
+	 * @param args ei k‰ytˆss‰
+	 */
+	public static void main(String[] args) {
+		Asukkaat asukkaat = new Asukkaat();
+		
+		Asukas as1 = new Asukas();
+		Asukas as2 = new Asukas();
+		Asukas as3 = new Asukas();
+		Asukas as4 = new Asukas();
+        Asukas as5 = new Asukas();
+        Asukas as6 = new Asukas();
+        Asukas as7 = new Asukas();
+        Asukas as8 = new Asukas();
+        Asukas as9 = new Asukas();
+        Asukas as10 = new Asukas();
+        Asukas as11 = new Asukas();
+        Asukas as12 = new Asukas();
+        as1.vastaaTupu();
+		as2.vastaaTupu();
+		as3.vastaaTupu();
+		as4.vastaaTupu();
+		as5.vastaaTupu();
+		as6.vastaaTupu();
+		as7.vastaaTupu();
+		as8.vastaaTupu();
+		as9.vastaaTupu();
+		as10.vastaaTupu();
+		as11.vastaaTupu();
+		as12.vastaaTupu();
+        as1.lisaaId();
+		as2.lisaaId();
+		as3.lisaaId();
+		as4.lisaaId();
+		as5.lisaaId();
+		as6.lisaaId();
+		as7.lisaaId();
+		as8.lisaaId();
+		as9.lisaaId();
+		as10.lisaaId();
+		as11.lisaaId();
+		as12.lisaaId();
+        
+		try {
+			asukkaat.lisaa(as1);
+			asukkaat.lisaa(as2);
+			asukkaat.lisaa(as3);
+			asukkaat.lisaa(as4);
+			asukkaat.lisaa(as5);
+			asukkaat.lisaa(as6);
+			asukkaat.lisaa(as7);
+			asukkaat.lisaa(as8);
+			asukkaat.lisaa(as9);
+			asukkaat.lisaa(as10);
+			asukkaat.lisaa(as11);
+            asukkaat.poista(as2);
+			asukkaat.lisaa(as12);
+			
+			System.out.println("============= Asukkaat testi =================");
+			
+			for(int i = 0; i < asukkaat.getLkm(); i++) {
+				Asukas asukas = asukkaat.anna(i);
+				System.out.println("Asukkaan numero: " + i);
+				asukas.tulosta(System.out);
+			}
+			
+		} catch (SailoException ex) {
+			System.out.println(ex.getMessage());
+		}
+	}
+}

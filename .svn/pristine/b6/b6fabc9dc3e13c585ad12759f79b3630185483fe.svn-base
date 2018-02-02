@@ -1,0 +1,336 @@
+package KamppistenKotityotGUI;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
+
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import KamppistenKotityotAsukkaat.*;
+import KamppistenKotityotKamppistenKotityot.*;
+import KamppistenKotityotKotityot.*;
+
+import fi.jyu.mit.fxgui.*;
+
+
+/**
+ * Controller tiedosto KamppistenKotityotGUI ohjelmalle.
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 4.2.2016
+ *
+ */
+public class KamppistenKotityotController implements Initializable {
+	
+//	private Asukkaat asukkaat = new Asukkaat();
+//	private Kotityot ktt = new Kotityot();
+	private KamppistenKotityot kamppistenKotityot;
+	private ObservableList<Asukas> listdataAsukkaat = FXCollections.observableArrayList();
+	private ObservableList<Kotityo> listdataKotityot = FXCollections.observableArrayList();
+	private ObservableList<Asukas> listdataSeuraavana = FXCollections.observableArrayList();
+    private ListView<Asukas> listAsukkaat = new ListView<Asukas>();
+    private ListView<Kotityo> listKotityot = new ListView<Kotityo>();
+    private ListView<Asukas> listSeuraavana = new ListView<Asukas>();
+	private Asukas asukasKohdalla;
+	private Kotityo kotityoKohdalla;
+	
+	@FXML private ListChooser chooserAsukkaat;
+	@FXML private ListChooser chooserKotityot;
+    @FXML private ListChooser chooserSeuraavana;
+	
+	@Override
+	public void initialize(URL url, ResourceBundle bundle) {
+		alusta();
+	}
+	
+	/**
+     * Luokka, jolla hoidellaan miten asukas näytetään listassa 
+     */
+    public static class CellAsukas extends ListCell<Asukas> {
+        @Override protected void updateItem(Asukas item, boolean empty) {
+            super.updateItem(item, empty); // ilman tätä ei näy valinta
+            setText(empty ? "" : item.getNimi());
+        }
+    }
+    
+    
+    /**
+     * Luokka, jolla hoidellaan miten kotityö näytetään listassa 
+     */
+    public static class CellKotityo extends ListCell<Kotityo> {
+        @Override protected void updateItem(Kotityo item, boolean empty) {
+            super.updateItem(item, empty); // ilman tätä ei näy valinta
+            setText(empty ? "" : item.getNimi());
+        }
+    }
+
+    
+//    /**
+//     * Luokka, jolla hoidellaan miten seuraavana vuorossa oleva asukas näytetään listassa 
+//     */
+//    public static class CellSeuraavana extends ListCell<Kotityo> {
+//        @Override protected void updateItem(Kotityo item, boolean empty) {
+//            super.updateItem(item, empty); // ilman tätä ei näy valinta
+//            setText(empty ? "" : item.getSeuraavanaVuorossa());
+//        }
+//    }
+    
+    
+    @FXML void handleLisaaAsukas() {
+        lisaaAsukas();
+        try {
+			kamppistenKotityot.talleta();
+		} catch (SailoException e) {
+			Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + e.getMessage());
+		}
+    }
+
+    @FXML void handleLisaaKotityo() {
+        lisaaKotityo();
+        try {
+			kamppistenKotityot.talleta();
+		} catch (SailoException e) {
+			Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + e.getMessage());
+		}
+    }
+
+    @FXML void handleMerkitseTehdyksi() {
+        merkitseTehdyksi();
+        try {
+			kamppistenKotityot.talleta();
+		} catch (SailoException e) {
+			Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + e.getMessage());
+		}
+    }
+
+    @FXML void handleMerkitseTekijaksi() {
+        merkitseTekijaksi();
+        try {
+			kamppistenKotityot.talleta();
+		} catch (SailoException e) {
+			Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + e.getMessage());
+		}
+    }
+
+    @FXML private void handlePoistaAsukas() throws SailoException {
+        poistaAsukas();
+        try {
+			kamppistenKotityot.talleta();
+		} catch (SailoException e) {
+			Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + e.getMessage());
+		}
+    }
+
+    @FXML void handlePoistaKotityo() {
+        poistaKotityo();
+        try {
+			kamppistenKotityot.talleta();
+		} catch (SailoException e) {
+			Dialogs.showMessageDialog("Tallennuksessa ongelmia! " + e.getMessage());
+		}
+    }
+    
+    /**
+     * Alustetaan pääikkuna
+     */
+    protected void alusta() {
+        BorderPane parentAs = (BorderPane)chooserAsukkaat.getParent();
+        parentAs.setCenter(listAsukkaat);
+        GridPane parentKtGrid = (GridPane)chooserKotityot.getParent();
+        parentKtGrid.add(listKotityot,0,1);
+        parentKtGrid.add(listSeuraavana,1,1);
+        listAsukkaat.setCellFactory( p -> new ListCell<Asukas>() {
+            @Override protected void updateItem(Asukas item, boolean empty) {
+                super.updateItem(item, empty); 
+                setText(empty ? "" : item.getNimi());
+            }
+        });
+        listKotityot.setCellFactory( q -> new ListCell<Kotityo>() {
+            @Override protected void updateItem(Kotityo item, boolean empty) {
+                super.updateItem(item, empty); 
+                setText(empty ? "" : item.getNimi());
+            }
+        });
+        listSeuraavana.setCellFactory( p -> new ListCell<Asukas>() {
+            @Override protected void updateItem(Asukas item, boolean empty) {
+                super.updateItem(item, empty); 
+                setText(empty ? "" : item.getNimi());
+            }
+        });
+    }
+
+    
+    /**
+     * @param kampKot käytettävä kämppisten kotityö
+     */
+    public void setKamppistenKotityot(KamppistenKotityot kampKot) {
+    	this.kamppistenKotityot = kampKot;
+    }
+    
+    
+    /**
+     * @param nimi tiedosto josta tiedot luetaan
+     * @return jos onnistuu, muuten tulostetaan virhe.
+     */
+    protected String lueTiedosto(String nimi) {
+    	try {
+    		kamppistenKotityot.lueTiedosto(nimi);
+    		haeAsukas(0);
+    		haeKotityo(0);
+    		haeSeuraavana(0,0);
+    		return null;
+    	} catch (SailoException e) {
+    		String virhe = e.getMessage();
+    		if (virhe != null) Dialogs.showMessageDialog(virhe);
+    		return virhe;
+    	}
+    }
+    
+    
+    /**
+     * Avaa ikkunan asukkaan lisäämiseksi.
+     */
+    protected void lisaaAsukas() {
+        //String lisaaAsukas = Dialogs.showInputDialog("Lisättävän asukkaan nimi", "");
+        //if (lisaaAsukas == null) return;
+        Asukas uusi = new Asukas();
+        uusi.lisaaId();
+        uusi.vastaaTupu();
+        try {
+        	kamppistenKotityot.lisaaAsukas(uusi);
+        }
+        catch (SailoException e) {
+        	Dialogs.showMessageDialog("Ongelmia uuden luomisessa " + e.getMessage());
+        	return;
+        }
+        haeAsukas(uusi.getId());
+    }
+    
+    
+    /**
+     * Avaa ikkunan kotityön lisäämiseksi.
+     */
+    protected void lisaaKotityo() {
+        //String lisaaKotityo = Dialogs.showInputDialog("Lisättävä kotityo", "");
+        //if (lisaaKotityo == null) return;
+        //Dialogs.showMessageDialog("Ei osata vielä lisätä kotityötä");
+        Kotityo kt = new Kotityo("Imurointi");
+        kamppistenKotityot.lisaaKotityo(kt);
+        haeKotityo(kt.getId());
+    }
+    
+    
+    /**
+     * Siirtää valitun työn edellisiin kertoihin ja siirtää edellisillä kerroilla 
+     * tehtyjä töitä yhden taaksepäin.
+     */
+    private void merkitseTehdyksi() {
+        Dialogs.showMessageDialog("Ei osata vielä merkitä tehdyksi");
+    }
+
+    
+    /**
+     * Merkitsee valitun asukkaan valitun kotityön tekijäksi.
+     */
+    private void merkitseTekijaksi() {
+        asukasKohdalla = listAsukkaat.getSelectionModel().getSelectedItem();
+        kotityoKohdalla = listKotityot.getSelectionModel().getSelectedItem();
+        if (asukasKohdalla == null || kotityoKohdalla == null) return;
+        kamppistenKotityot.asetaTekija(asukasKohdalla, kotityoKohdalla);
+        haeSeuraavana(asukasKohdalla.getId(), kotityoKohdalla.getId());
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun asukkaan poiston varmistamiseksi. 
+     * @throws SailoException 
+     */
+    private void poistaAsukas() throws SailoException {
+    	asukasKohdalla = listAsukkaat.getSelectionModel().getSelectedItem();
+    	if (asukasKohdalla == null) return;
+    	boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa asukkaan " + asukasKohdalla.getNimi(), "Kyllä", "Peruuta");
+        if (vastaus) 
+    	kamppistenKotityot.poistaAsukas(asukasKohdalla);
+    	haeAsukas(0);
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun kotityön poiston varmistamiseksi.
+     */
+    private void poistaKotityo() {
+    	kotityoKohdalla = listKotityot.getSelectionModel().getSelectedItem();
+    	if (kotityoKohdalla == null) return;
+    	boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa kotityön " + kotityoKohdalla.getNimi(), "Kyllä", "Peruuta");
+        if (vastaus) Dialogs.showMessageDialog("Ei osata poistaa kotityötä");
+//        haeKotityo(0);
+        return;
+    }
+    
+    /**
+     * Hakee asukkaan tiedot listaan
+     * @param id asukkaan viitenumero
+     */
+    protected void haeAsukas(int id) {
+    	listdataAsukkaat.clear();
+    	listAsukkaat.setItems(listdataAsukkaat);
+    	
+    	int index = 0;
+    	for (int i = 0; i < kamppistenKotityot.getAsukkaita(); i++) {
+    		Asukas asukas = kamppistenKotityot.annaAsukas(i);
+    		if (asukas.getId() == id) index = i;
+    		listdataAsukkaat.add(asukas);
+    	}
+    	listAsukkaat.getSelectionModel().select(index);
+    }
+    
+    
+    /**
+     * Hakee seuraavana vuorossa olevan asukkaan tiedot listaan seuraavanaVuorossa
+     * @param idAsukas asukkaan viitenumero
+     * @param idKotityo kotityon viitenumero
+     */
+    protected void haeSeuraavana(int idAsukas, int idKotityo) {
+    	listSeuraavana.setItems(listdataSeuraavana);
+        int index = 0;
+        for (int i = 0; i<kamppistenKotityot.getKotitoita(); i++) {
+            if (kamppistenKotityot.getKotitoita() > listdataSeuraavana.size()) {
+                Asukas apu = new Asukas();
+                listdataSeuraavana.add(apu);
+            }
+            if(kamppistenKotityot.moneskoKotityo(idKotityo) == i) {
+                listdataSeuraavana.set(i, kamppistenKotityot.annaAsukas(idAsukas-1));
+                index = i;
+            }
+            
+            
+        }
+        listSeuraavana.getSelectionModel().select(index);
+        
+    }    
+    
+    
+    /**
+     * Hakee kotityön listaan
+     * @param id kotityön id
+     */
+    protected void haeKotityo(int id) {
+        listdataKotityot.clear();
+        listKotityot.setItems(listdataKotityot);
+        
+        int index = 0;
+        for ( int i = 0; i < kamppistenKotityot.getKotitoita(); i++) {
+            Kotityo kt = kamppistenKotityot.annaKotityot().get(i);
+            if (kt.getId() == id) index = i;
+            listdataKotityot.add(kt);
+        }
+        listKotityot.getSelectionModel().select(index);
+    }
+}

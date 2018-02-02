@@ -1,0 +1,135 @@
+package KamppistenKotityotGUI;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.ListView;
+import KamppistenKotityotAsukkaat.*;
+import KamppistenKotityotKamppistenKotityot.*;
+import KamppistenKotityotKotityot.*;
+
+import fi.jyu.mit.fxgui.*;
+
+
+/**
+ * Controller tiedosto KamppistenKotityotGUI ohjelmalle.
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 4.2.2016
+ *
+ */
+public class KamppistenKotityotController {
+	
+	private Asukkaat asukkaat = new Asukkaat();
+	private Kotityot ktt = new Kotityot();
+	private KamppistenKotityot kamppistenKotityot;
+	private ObservableList<Asukas> listdataAsukkaat = FXCollections.observableArrayList();
+	private ListView<Asukas> listAsukkaat = new ListView<Asukas>();
+	
+    @FXML void handleLisaaAsukas() {
+        lisaaAsukas();
+    }
+
+    @FXML void handleLisaaKotityo() {
+        lisaaKotityo();
+    }
+
+    @FXML void handleMerkitseTehdyksi() {
+        merkitseTehdyksi();
+    }
+
+    @FXML void handleMerkitseTekijaksi() {
+        merkitseTekijaksi();
+    }
+
+    @FXML private void handlePoistaAsukas() throws SailoException {
+        poistaAsukas();
+    }
+
+    @FXML void handlePoistaKotityo() {
+        poistaKotityo();
+    }
+    
+    
+    /**
+     * Avaa ikkunan asukkaan lisäämiseksi.
+     */
+    private void lisaaAsukas() {
+        //String lisaaAsukas = Dialogs.showInputDialog("Lisättävän asukkaan nimi", "");
+        //if (lisaaAsukas == null) return;
+        Asukas uusi = new Asukas();
+        uusi.lisaaId();
+        uusi.vastaaTupu();
+        try {
+        	kamppistenKotityot.lisaaAsukas(uusi);
+        }
+        catch (SailoException e) {
+        	Dialogs.showMessageDialog("Ongelmia uuden luomisessa " + e.getMessage());
+        	return;
+        }
+        hae(uusi.getId());
+    }
+    
+    
+    /**
+     * Avaa ikkunan kotityön lisäämiseksi.
+     */
+    private void lisaaKotityo() {
+        String lisaaKotityo = Dialogs.showInputDialog("Lisättävä kotityo", "");
+        if (lisaaKotityo == null) return;
+        Dialogs.showMessageDialog("Ei osata vielä lisätä kotityötä");
+    }
+    
+    
+    /**
+     * Siirtää valitun työn edellisiin kertoihin ja siirtää edellisillä kerroilla 
+     * tehtyjä töitä yhden taaksepäin.
+     */
+    private void merkitseTehdyksi() {
+        Dialogs.showMessageDialog("Ei osata vielä merkitä tehdyksi");
+    }
+
+    
+    /**
+     * Merkitsee valitun asukkaan valitun kotityön tekijäksi.
+     */
+    private void merkitseTekijaksi() {
+        Dialogs.showMessageDialog("Ei osata vielä merkitä tekijää");
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun asukkaan poiston varmistamiseksi. 
+     */
+    private void poistaAsukas() throws SailoException {
+        boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa asukkaan Tupu", "Kyllä", "Peruuta");
+        if (vastaus == true) asukkaat.poista(0, asukkaat.getLkm());
+        return;
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun kotityön poiston varmistamiseksi.
+     */
+    private void poistaKotityo() {
+        boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa kotityön vessan siivous", "Kyllä", "Peruuta");
+        if (vastaus == true) Dialogs.showMessageDialog("Ei osata poistaa kotityötä");
+        return;
+    }
+    
+    /**
+     * 
+     * @param id asukkaan viitenumero
+     */
+    private void hae(int id) {
+    	listdataAsukkaat.clear();
+    	listAsukkaat.setItems(listdataAsukkaat);
+    	
+    	int index = 0;
+    	for(int i = 0; i < kamppistenKotityot.getAsukkaita(); i++) {
+    		Asukas asukas = kamppistenKotityot.annaAsukas(i);
+    		
+    	}
+    }
+}

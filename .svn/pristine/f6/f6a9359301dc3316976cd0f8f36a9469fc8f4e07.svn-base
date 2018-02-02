@@ -1,0 +1,38 @@
+package KamppistenKotityotGUI;
+	
+import javafx.application.Application;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.fxml.FXMLLoader;
+
+
+/**
+ * Hyödyllisin ohjelma ikinä!
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 4.2.2016
+ *
+ */
+public class KamppistenKotityotMain extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("KamppistenKotityotViewPaaIkkuna.fxml"));
+			Scene scene = new Scene(root);
+			//scene.getStylesheets().add(getClass().getResource("kamppistenKotityot.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.show();
+			primaryStage.setTitle("Kämppisten kotityöt");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Pääohjelma Kämppisten kotitöitä varten.
+	 * @param args ei käytössä
+	 */
+	public static void main(String[] args) {
+		launch(args);
+	}
+}

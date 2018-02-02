@@ -1,0 +1,280 @@
+package KamppistenKotityotKotityot;
+
+import java.io.*;
+import java.util.*;
+import KamppistenKotityotAsukkaat.SailoException;
+
+/**
+ * Luokka, joka hallitsee kotityö-rekisteriä
+ * @author Tomi Nyyssönen & Juho Kajanto
+ *   juho_kajanto@hotmail.com
+ *   toalnyys@student.jyu.fi
+ * @version 21.3.2016
+ *
+ */
+public class Kotityot implements Iterable<Kotityo> {
+
+    private final Collection<Kotityo> kotityot = new ArrayList<Kotityo>();
+    private String tiedostonNimi = "";
+    
+    
+    /**
+     * Muodostaja. Kotityot alustus.
+     */
+    public Kotityot() {
+        //Ei vielä mitään
+    }
+    
+    
+    /**
+     * Lisää kotityön
+     * @param kt lisättävä kotityö
+     */
+    public void lisaaKotityo(Kotityo kt) {
+        kotityot.add(kt);
+        kt.kasvataId();
+    }
+    
+    
+    /**
+     * Lisää kotityö kasvattamatta id:tä. (Tiedoston lukua varten)
+     * @param kt lisättävä kotityö
+     */
+    public void lisaaKotityo2(Kotityo kt) {
+        kotityot.add(kt);
+    }
+    
+    
+    /**
+     * Poistaa kotityön.
+     * @param kt poistettava kotityo
+     */
+    public void poistaKotityo(Kotityo kt) {
+        kotityot.remove(kt);
+    }
+
+
+    /**
+     * Luetaan kotitöiden tiedot tiedostosta
+     * @param hakemisto tiedoston hakemisto
+     * @throws SailoException jos tiedoston lukeminen epäonnistuu
+     * @example
+     * <pre name="test">
+     * #THROWS SailoException 
+     * #import java.io.File;
+     * #import KamppistenKotityotAsukkaat.SailoException;
+     *  Kotityot ktt = new Kotityot();
+     *  Kotityo kt1 = new Kotityo("Imurointi");
+     *  Kotityo kt2 = new Kotityo("Imurointi");
+     *  Kotityo kt3 = new Kotityo("Imurointi");
+     *  String tiedNimi = "testiKamppistenKotityot";
+     *  File ftied = new File(tiedNimi + ".dat");
+     *  ftied.delete();
+     *  ktt.lueTiedostosta(tiedNimi); #THROWS SailoException
+     *  ktt.lisaaKotityo(kt1);
+     *  ktt.lisaaKotityo(kt2);
+     *  ktt.lisaaKotityo(kt3);
+     *  ktt.talleta();
+     *  ktt = new Kotityot();
+     *  ktt.lueTiedostosta(tiedNimi);
+     *  Iterator<Kotityo> i = ktt.iterator();
+     *  i.next().toString() === kt1.toString();
+     *  i.next().toString() === kt2.toString();
+     *  i.next().toString() === kt3.toString();
+     *  i.hasNext() === false;
+     *  ktt.lisaaKotityo(kt1);
+     *  ktt.talleta();
+     *  ftied.delete() === true;
+     *  File fbak = new File(tiedNimi+".bak");
+     *  fbak.delete() === true;
+     *  </pre>
+     */
+    public void lueTiedostosta(String hakemisto) throws SailoException {
+        setTiedostonNimi(hakemisto);
+        try ( BufferedReader fi = new BufferedReader(new FileReader(getTiedostonNimi())) ) {
+            String rivi;
+            while ((rivi = fi.readLine()) != null) {
+                rivi = rivi.trim();
+                if ("".equals(rivi)) continue;
+                Kotityo kt = new Kotityo();
+                kt.parse(rivi);
+                lisaaKotityo2(kt);
+            }
+        } catch (FileNotFoundException e) {
+            throw new SailoException("Tiedostoa " + tiedostonNimi + " ei löydy");
+        } catch (IOException e) {
+            throw new SailoException("Tiedoston kanssa ongelmia " + e.getMessage());
+        }
+    }
+    
+    
+    /**
+     * Luetaan aikaisemmin annetun nimisestä tiedostosta
+     * @throws SailoException jos tulee poikkeus
+     */
+    public void lueTiedostosta() throws SailoException {
+        lueTiedostosta(tiedostonNimi);
+    }
+    
+    
+    /**
+     * Tallentaa kotityöt tiedostoon.
+     * @throws SailoException jos talletus epäonnistuu
+     *
+     */
+    public void talleta() throws SailoException {
+        File fbak = new File(getBakNimi());
+        File ftied = new File(getTiedostonNimi());
+        fbak.delete();
+        ftied.renameTo(fbak);
+
+        try ( PrintWriter fo = new PrintWriter(new FileWriter(ftied.getCanonicalPath())) ) {
+            for (Kotityo kt : this) {
+                fo.println(kt.toString());
+            }
+        } catch ( FileNotFoundException ex ) {
+            throw new SailoException("Tiedosto " + ftied.getName() + " ei aukea");
+        } catch ( IOException ex ) {
+            throw new SailoException("Tiedoston " + ftied.getName() + " kirjoittamisessa ongelmia");
+        }
+    }
+    
+    
+    /**
+     * Palauttaa varmuuskopiotiedoston nimen 
+     * @return varmuuskopion nimi.
+     */
+    public String getBakNimi() {
+        return tiedostonNimi + ".bak";
+    }
+    
+    
+    /**
+     * Palauttaa tallennukseen käytettävän nimen.
+     * @return tallennukseen käytettävän nimi
+     */
+    public String getTiedostonNimi() {
+        return tiedostonNimi + ".dat";
+    }
+    
+    
+    /**
+     * Asettaa tiedoston nimen ilman tarkenninta
+     * @param tied tallennustiedoston perusnimi
+     */
+    public void setTiedostonNimi(String tied) {
+        tiedostonNimi = tied;
+    }
+    
+    
+    /**
+     * Palauttaa KamppistenKotityot Kotitöiden lukumäärän
+     * @return Kotitöiden lukumäärä
+     */
+    public int getLkm() {
+        return kotityot.size();
+    }
+
+
+    /**
+     * Iteraattori kaikkien kotitöiden läpikäymiseen
+     * @return kotityoiteraattori
+     */
+    @Override
+    public Iterator<Kotityo> iterator() {
+        return kotityot.iterator();
+    }
+        
+    
+    /**
+     * Haetaan kaikki kotityöt
+     * @return tietorakenne jossa viiteet löydetteyihin kotitöihin
+     * @example
+     * <pre name="test">
+     * #import java.util.*;
+     * #import KamppistenKotityotKotityot.Kotityo;
+     *  Kotityot ktt = new Kotityot();
+     *  Kotityo kt1 = new Kotityo("Imurointi"); ktt.lisaaKotityo(kt1);
+     *  Kotityo kt2 = new Kotityo("Vessan pesu"); ktt.lisaaKotityo(kt2);
+     *  Kotityo kt3 = new Kotityo("Roskien vienti"); ktt.lisaaKotityo(kt3);
+     *  Kotityo kt4 = new Kotityo("Olohuoneen siivous"); ktt.lisaaKotityo(kt4);
+     *  Kotityo kt5 = new Kotityo("Koiran ulkoilutus"); ktt.lisaaKotityo(kt5);
+     *  Kotityo kt6 = new Kotityo("Pölyjen pyyhintä"); ktt.lisaaKotityo(kt6);
+     *  
+     *  List<Kotityo> loytyneet;
+     *  loytyneet = ktt.annaKotityot();
+     *  loytyneet.size() === 6; 
+     *  loytyneet.get(0) == kt1 === true;
+     *  loytyneet.get(1) == kt2 === true;
+     * </pre> 
+     */
+    public List<Kotityo> annaKotityot() {
+        List<Kotityo> loydetyt = new ArrayList<Kotityo>();
+        for (Kotityo kt : kotityot)
+            loydetyt.add(kt);
+        return loydetyt;
+    }
+    
+    
+    /**
+     * @param id kotityön viitenumero
+     * @return haluttu kotityö
+     * @throws SailoException jos kotityötä ei löydy
+     */
+    public Kotityo annaKotityo(int id) throws SailoException {
+    	for (Kotityo kt : kotityot) {
+    		if (kt.getId() == id) return kt;
+    	}
+    	throw new SailoException("Kotityötä ei löydy.");
+    }
+    
+    
+    /**
+     * Etsii kotityölistasta parametrina tuodun viitenumeron omaavan kotityön. Jos kyseistä 
+     * kotityötä ei löydy, palauttaa -1.
+     * @param id kotityön viitenumero
+     * @return indeksi missä haluttu kotityö listalla sijaitsee
+     */
+    public int moneskoKotityo(int id) {
+        for(int i = 0; i < kotityot.size(); i++) {
+            if(this.annaKotityot().get(i).getId() == id) return i;
+        }
+        return -1;
+    }
+    
+    
+    /**
+     * Etsii kotityön listalta ja palauttaa sen viitenumeron.
+     * @param index kotityön indeksi listalla
+     * @return kotityön id
+     */
+    public int kotityonId(int index) {
+    	return this.annaKotityot().get(index).getId();
+    }
+        
+    
+    /**
+     * Testiohjelma Kotitöille
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+        System.out.println("==============================Kotityot Testi==============================");
+        Kotityot ktt = new Kotityot();
+        Kotityo kt1 = new Kotityo("Vessan siivous", 1);
+        Kotityo kt2 = new Kotityo("Imurointi");
+        Kotityo kt3 = new Kotityo("Roskien vieminen", 2, 5, 2);
+        ktt.lisaaKotityo(kt1);
+        ktt.lisaaKotityo(kt2);
+        ktt.lisaaKotityo(kt3);
+        for (Kotityo kt : ktt) {
+            kt.tulosta(System.out);
+        }
+        Kotityo kt4 = new Kotityo("Koiran ulkoilutus", 3, 4);
+        ktt.poistaKotityo(kt2);
+        ktt.lisaaKotityo(kt4);
+        System.out.println();
+        for (Kotityo kt : ktt) {
+            kt.tulosta(System.out);
+        }
+    }
+}

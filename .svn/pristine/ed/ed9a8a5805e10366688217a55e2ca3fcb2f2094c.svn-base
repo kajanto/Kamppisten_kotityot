@@ -1,0 +1,40 @@
+!https://trac.cc.jyu.fi/projects/ohj2ht/wiki/k2016/suunnitelmat/Kamppisten_kotityot = Suunnitelma Wikissä
+kuvat/etusivu.png = ohjelman pääikkuna (piirretty paint.netillä)
+kuvat/lisaaminen.png      = ikkuna jossa lisätään listoihin alkioita (paint.net)
+kuvat/poistaminen.png   = ikkuna jossa varmistetaan listan alkion poisto (paint.net)
+kuvat/PaaIkkuna.png   = ohjelman pääikkuna (scenebuilderilla tehty)
+kuvat/LisaaAsukas.png   = ikkuna jossa lisätään asukas (scenebuilderilla tehty)
+kuvat/LisaaKotityo.png  = ikkuna jossa lisätään kotityö (scenebuilderilla tehty)
+kuvat/taustakuva.jpg = taustakuva pääikkunassa
+
+= <h3>Tietorakenne ja luokat</h3>
+@https://trac.cc.jyu.fi/projects/ohj2ht/wiki/k2016/suunnitelmat/Kamppisten_kotityotCRC = CRC-kortit Wikissä
+tietorakenteet/kamppistenKotityothar.png = tietorakenteen kuva
+tietorakenteet/kamppistenKotityothar.vsd = tietorakenteen kuva (alkuperäinen visiolla tehty)
+tietorakenteet/crcAsukas.txt = CRC-kortti Asukas-luokalle
+tietorakenteet/crcAsukkaat.txt = CRC-kortti Asukkaat-luokalle
+tietorakenteet/crcKamppistenKotityot.txt = CRC-kortti KämppistenKotityöt-luokalle
+tietorakenteet/crcKayttoliittyma.txt = CRC-kortti Käyttöliittymä-luokalle
+tietorakenteet/crcKotityo.txt = CRC-kortti Kotityö-luokalle
+tietorakenteet/crcKotityot.txt = CRC-kortti Kotityöt-luokalle
+
+src/KamppistenKotityotGUI/KamppistenKotityotViewPaaIkkuna.fxml = pääikkunan FXML tiedosto
+src/KamppistenKotityotGUI/KamppistenKotityotViewLisaaKotityo.fxml = lisaakotityo FXML tiedosto
+src/KamppistenKotityotGUI/KamppistenKotityotViewLisaaAsukas.fxml = lisaaasukas FXML tiedosto
+src/KamppistenKotityotGUI/KamppistenKotityotController.java = controller java tiedosto
+src/KamppistenKotityotGUI/KamppistenKotityotMain.java = Main java tiedosto
+
+src/KamppistenKotityotAsukkaat/Asukkaat.java = asukkaiden käsittely
+src/KamppistenKotityotAsukkaat/Asukas.java = asukas, joka huolehtii tiedoistaas
+src/KamppistenKotityotAsukkaat/SailoException.java = Poikkeusluokka tietorakenteesta tuleville virheille
+
+src/KamppistenKotityotKotityot/Kotityo.java = yksittäisen kotityön käsittely luokka
+src/KamppistenKotityotKotityot/Kotityot.java = monen kotityön käsittelemiseen tehty luokka
+
+src/KamppistenKotityotKamppistenKotityot/KamppistenKotityot.java = Asukkaat ja Kotityot sitova luokka
+
+Kamppisten_kotityot.jar = Ajettava jar-tiedosto ohjelmalle
+build.xml = ANT-skripti jar-tiedoston luontia varten
+
+.classpath = Eclipsen luokkapolku
+.project = Eclipsen projekti

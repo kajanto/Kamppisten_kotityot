@@ -1,0 +1,278 @@
+package KamppistenKotityotKamppistenKotityot;
+
+import java.util.List;
+
+import KamppistenKotityotAsukkaat.Asukas;
+import KamppistenKotityotAsukkaat.Asukkaat;
+import KamppistenKotityotAsukkaat.SailoException;
+import KamppistenKotityotKotityot.Kotityo;
+import KamppistenKotityotKotityot.Kotityot;
+
+/**
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 28.3.2016
+ *
+ */
+public class KamppistenKotityot {
+    
+    private final Asukkaat asukkaat = new Asukkaat();
+    private final Kotityot kotityot = new Kotityot(); 
+    
+    
+    /**
+     * Get metodi asukkaiden lukumäärälle
+     * @return asukkaiden lukumäärä
+     */
+    public int getAsukkaita() {
+        return asukkaat.getLkm();
+    }
+
+    
+    
+    /**
+     * Get metodi kotitöiden lukumäärälle
+     * @return kotitöiden lukumäärä
+     */
+    public int getKotitoita() {
+        return kotityot.getLkm();
+    }
+    
+    
+    /**
+     * Asettaa kotityölle tekijän. Jos työllä on ollut aikaisempi tekijä, siirtää aikaisempia
+     * tekijöitä taaksepäin, siten että 
+     * 
+     * seuraavanaVuorossa -> edellinenKerta
+     * edellinenKerta -> sitaEdeltava
+     * sitaEdeltava -> toistaEdeltava
+     * 
+     * Toista edeltävästä kerrasta eteenpäin vuoroja ei enää pidetä yllä
+     * @param as asukas, jolle kotityö asetetaan 
+     * @param kt kotityö, joka asetetaan
+     * @example
+     * <pre name="test">
+     * #import KamppistenKotityotKotityot.Kotityo;
+     * #import KamppistenKotityotAsukkaat.Asukas;
+     * KamppistenKotityot kkt = new KamppistenKotityot();
+     * Kotityo kt1 = new Kotityo("Imurointi");
+     * Asukas as1 = new Asukas();
+     * as1.vastaaTupu();
+     * as1.lisaaId();
+     * kkt.asetaTekija(as1, kt1);
+     * kt1.getSeuraavanaVuorossa() === 1;
+     * Asukas as2 = new Asukas();
+     * as2.vastaaTupu();
+     * as2.lisaaId();
+     * kkt.asetaTekija(as2, kt1);
+     * kt1.getSeuraavanaVuorossa() === 2;
+     * kt1.getEdellinenKerta() === 1;
+     * Asukas as3 = new Asukas();
+     * as3.vastaaTupu();
+     * as3.lisaaId();
+     * kkt.asetaTekija(as3, kt1);
+     * kt1.getSeuraavanaVuorossa() === 3;
+     * kt1.getEdellinenKerta() === 2;
+     * kt1.getSitaEdeltava() === 1;
+     * Asukas as4 = new Asukas();
+     * as4.vastaaTupu();
+     * as4.lisaaId();
+     * kkt.asetaTekija(as4, kt1);
+     * kt1.getSeuraavanaVuorossa() === 4;
+     * kt1.getEdellinenKerta() === 3;
+     * kt1.getSitaEdeltava() === 2;
+     * kt1.getToistaEdeltava() === 1;
+     * Asukas as5 = new Asukas();
+     * as5.vastaaTupu();
+     * as5.lisaaId();
+     * kkt.asetaTekija(as5, kt1);
+     * kt1.getSeuraavanaVuorossa() === 5;
+     * kt1.getEdellinenKerta() === 4;
+     * kt1.getSitaEdeltava() === 3;
+     * kt1.getToistaEdeltava() === 2;
+     * </pre>
+     */
+    public void asetaTekija(Asukas as, Kotityo kt) {
+        if (kt.getSitaEdeltava() != -1) kt.setToistaEdeltava(kt.getSitaEdeltava());
+        if (kt.getEdellinenKerta() != -1) kt.setSitaEdeltava(kt.getEdellinenKerta());
+        if (kt.getSeuraavanaVuorossa() != -1) kt.setEdellinenKerta(kt.getSeuraavanaVuorossa());
+        kt.setSeuraavanaVuorossa(as.getId());
+    }
+    
+    
+    
+    /**
+     * Lisätään asukas 
+     * @param as lisättävä asukas
+     * @throws SailoException jos lisäystä ei voida tehdä
+     */
+    public void lisaaAsukas(Asukas as) throws SailoException {
+        asukkaat.lisaa(as);
+    }
+    
+    
+    /**
+     * Lisätään kotityo
+     * @param kt lisättävä kotityo
+     */
+    public void lisaaKotityo(Kotityo kt) {
+        kotityot.lisaaKotityo(kt);
+    }
+    
+    
+    /**
+     * Poistaa halutun asukkaan
+     * @param as poistettava asukas
+     * @throws SailoException jos poistaminen ei onnistu
+     */
+    public void poistaAsukas(Asukas as) throws SailoException {
+        
+        asukkaat.poista(as.getId(), asukkaat.getLkm());
+    }
+    
+    
+    /**
+     * Poistaa halutun kotityön
+     * @param kt poistettava kotityö
+     */
+    public void poistaKotityo(Kotityo kt) {
+        kotityot.poistaKotityo(kt);
+    }
+    
+    
+    /**
+     * Palauttaa i:n asukkaan
+     * @param i monesko asukas palautetaan
+     * @return viite i:teen asukkaaseen
+     * @throws IndexOutOfBoundsException jos i väärin
+     */
+    public Asukas annaAsukas(int i) throws IndexOutOfBoundsException {
+        return asukkaat.anna(i);
+    }
+    
+    
+    /**
+     * Haetaan kaikki kotityöt
+     * @return tietorakenne jossa viiteet löydetteyihin kotitöihin
+     * @example
+     * <pre name="test">
+     * #import java.util.*;
+     * #import KamppistenKotityotKotityot.*;
+     *  Kotityot kt = new Kotityot();
+     *  Kotityo kt1 = new Kotityo("Imurointi"); kt.lisaaKotityo(kt1);
+     *  Kotityo kt2 = new Kotityo("Vessan pesu"); kt.lisaaKotityo(kt2);
+     *  Kotityo kt3 = new Kotityo("Roskien vienti"); kt.lisaaKotityo(kt3);
+     *  Kotityo kt4 = new Kotityo("Olohuoneen siivous"); kt.lisaaKotityo(kt4);
+     *  Kotityo kt5 = new Kotityo("Koiran ulkoilutus"); kt.lisaaKotityo(kt5);
+     *  Kotityo kt6 = new Kotityo("Pölyjen pyyhintä"); kt.lisaaKotityo(kt6);
+     *  
+     *  List<Kotityo> loytyneet;
+     *  loytyneet = kt.annaKotityot();
+     *  loytyneet.size() === 6; 
+     *  loytyneet.get(0) == kt1 === true;
+     *  loytyneet.get(1) == kt2 === true;
+     * </pre> 
+     */
+    public List<Kotityo> annaKotityot() {
+        return kotityot.annaKotityot();
+    }
+    
+    
+    /**
+     * Etsii kotityölistasta parametrina tuodun viitenumeron omaavan kotityön. Jos kyseistä 
+     * kotityötä ei löydy, palauttaa -1.
+     * @param id kotityön viitenumero
+     * @return indeksi missä haluttu kotityö listalla sijaitsee
+     */
+    public int moneskoKotityo(int id) {
+        return kotityot.moneskoKotityo(id);
+    }
+    
+    
+    /**
+     * Lukee tiedostosta kämppisten tiedot
+     * @param tiednimi tiedoston nimi
+     * @throws SailoException jos tiedoston lukemisessa on ongelmia
+     */
+    public void lueTiedosto(String tiednimi) throws SailoException {
+        kotityot.lueTiedostosta(tiednimi);
+        asukkaat.LueTiedostosta(tiednimi);
+    }
+    
+    
+    
+    /**
+     * Tallettaa kerhon tiedot tiedostoon
+     * @throws SailoException jos tallettamisessa ongelmia
+     */
+    public void talleta() throws SailoException {
+        asukkaat.tallenna();
+        kotityot.talleta();
+    }
+    
+    
+    /**
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+        KamppistenKotityot kamppistenKt = new KamppistenKotityot();
+        try {
+            //kamppistenKt.lueTiedosto("Kamppisten_kotityot");
+            
+            Asukas tupu1 = new Asukas();
+            tupu1.vastaaTupu();
+            tupu1.lisaaId();
+            
+            Asukas tupu2 = new Asukas();
+            tupu2.vastaaTupu();
+            tupu2.lisaaId();
+            
+            Asukas tupu3 = new Asukas();
+            tupu3.vastaaTupu();
+            tupu3.lisaaId();
+            
+            kamppistenKt.lisaaAsukas(tupu1);
+            kamppistenKt.lisaaAsukas(tupu2);
+            kamppistenKt.lisaaAsukas(tupu3);
+            
+            Kotityo kt1 = new Kotityo("Imurointi");
+            Kotityo kt2 = new Kotityo("Vessan siivous");
+            Kotityo kt3 = new Kotityo("Roskien vienti");
+            
+            kamppistenKt.lisaaKotityo(kt1);
+            kamppistenKt.lisaaKotityo(kt2);
+            kamppistenKt.lisaaKotityo(kt3);
+            
+            kamppistenKt.asetaTekija(tupu1, kt1);
+            kamppistenKt.asetaTekija(tupu2, kt2);
+            kamppistenKt.asetaTekija(tupu3, kt3);
+            
+            System.out.println("============================Kamppisten kotityot testi============================");
+            
+            for (int i = 0; i < kamppistenKt.getAsukkaita(); i++) {
+                Asukas as = kamppistenKt.annaAsukas(i);
+                as.tulosta(System.out);
+            }
+            
+            for (Kotityo kt : kamppistenKt.annaKotityot()) {
+                kt.tulosta(System.out);
+            }
+            
+            kamppistenKt.poistaAsukas(tupu2);
+            kamppistenKt.poistaKotityo(kt1);
+            
+            System.out.println();
+            for (int i = 0; i < kamppistenKt.getAsukkaita(); i++) {
+                Asukas as = kamppistenKt.annaAsukas(i);
+                as.tulosta(System.out);
+            }
+            
+            for (Kotityo kt : kamppistenKt.annaKotityot()) {
+                kt.tulosta(System.out);
+            }
+            
+        } catch (SailoException se) {
+            System.out.println(se.getMessage());
+        }
+    }
+
+}

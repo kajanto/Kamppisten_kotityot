@@ -1,0 +1,47 @@
+package KamppistenKotityotGUI;
+	
+import javafx.application.Application;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.fxml.FXMLLoader;
+import KamppistenKotityotKamppistenKotityot.KamppistenKotityot;
+
+
+/**
+ * Oikiasti hyödyllisin ohjelma ikinä!
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 4.2.2016
+ *
+ */
+public class KamppistenKotityotMain extends Application {
+	@Override
+	public void start(Stage primaryStage) {
+		try {
+			FXMLLoader ldr = new FXMLLoader(getClass().getResource("KamppistenKotityotViewPaaIkkuna.fxml"));
+			final BorderPane root = (BorderPane)ldr.load();
+			final KamppistenKotityotController KamppistenKotityotCtrl = (KamppistenKotityotController)ldr.getController(); 
+			
+			//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("KamppistenKotityotViewPaaIkkuna.fxml"));
+			Scene scene = new Scene(root);
+			//scene.getStylesheets().add(getClass().getResource("kamppistenKotityot.css").toExternalForm());
+			primaryStage.setScene(scene);
+			primaryStage.setTitle("Kämppisten kotityöt");
+			
+			KamppistenKotityot kampKot = new KamppistenKotityot();
+			KamppistenKotityotCtrl.setKamppistenKotityot(kampKot);
+			primaryStage.show();
+			KamppistenKotityotCtrl.lueTiedosto("tallennukset");
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Pääohjelma Kämppisten kotitöitä varten.
+	 * @param args ei käytössä
+	 */
+	public static void main(String[] args) {
+		launch(args);
+	}
+}

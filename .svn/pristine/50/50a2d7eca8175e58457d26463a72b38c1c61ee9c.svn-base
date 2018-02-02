@@ -1,0 +1,142 @@
+package KamppistenKotityotKamppistenKotityot;
+
+import KamppistenKotityotAsukkaat.Asukas;
+import KamppistenKotityotAsukkaat.Asukkaat;
+import KamppistenKotityotAsukkaat.SailoException;
+import KamppistenKotityotKotityot.Kotityo;
+import KamppistenKotityotKotityot.Kotityot;
+
+/**
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 28.3.2016
+ *
+ */
+public class KamppistenKotityot {
+    
+    private final Asukkaat asukkaat = new Asukkaat();
+    private final Kotityot kotityot = new Kotityot(); 
+    
+    
+    /**
+     * Get metodi asukkaiden lukumäärälle
+     * @return asukkaiden lukumäärä
+     */
+    public int getAsukkaita() {
+        return asukkaat.getLkm();
+    }
+    
+    
+    /**
+     * Asettaa kotityölle tekijän. Jos työllä on ollut aikaisempi tekijä, siirtää aikaisempia
+     * tekijöitä taaksepäin, siten että 
+     * 
+     * seuraavanaVuorossa -> edellinenKerta
+     * edellinenKerta -> sitaEdeltava
+     * sitaEdeltava -> toistaEdeltava
+     * 
+     * Toista edeltävästä kerrasta eteenpäin vuoroja ei enää pidetä yllä
+     * @param as asukas, jolle kotityö asetetaan 
+     * @param kt kotityö, joka asetetaan
+     * @example
+     * <pre name="test">
+     * #import KamppistenKotityotKotityot.Kotityo;
+     * #import KamppistenKotityotAsukkaat.Asukas;
+     * Kotityo kt1 = new Kotityo("Imurointi");
+     * Asukas as1 = new Asukas();
+     * as1.vastaaTupu();
+     * asetaTekija(as1, kt1);
+     * kt1.getSeuraavanaVuorossa() === 0;
+     * Asukas as2 = new Asukas();
+     * as2.vastaaTupu();
+     * asetaTekija(as2, kt1);
+     * kt1.getSeuraavanaVuorossa() === 1;
+     * kt1.getEdellinenKerta() === 0;
+     * Asukas as3 = new Asukas();
+     * as3.vastaaTupu();
+     * asetaTekija(as3, kt1);
+     * kt1.getSeuraavanaVuorossa() === 2;
+     * kt1.getEdellinenKerta() === 1;
+     * kt1.getSitaEdeltava() === 0;
+     * Asukas as4 = new Asukas();
+     * as4.vastaaTupu();
+     * asetaTekija(as4, kt1);
+     * kt1.getSeuraavanaVuorossa() === 3;
+     * kt1.getEdellinenKerta() === 2;
+     * kt1.getSitaEdeltava() === 1;
+     * kt1.getToistaEdeltava() === 0;
+     * Asukas as5 = new Asukas();
+     * as5.vastaaTupu();
+     * asetaTekija(as5, kt1);
+     * kt1.getSeuraavanaVuorossa() === 4;
+     * kt1.getEdellinenKerta() === 3;
+     * kt1.getSitaEdeltava() === 2;
+     * kt1.getToistaEdeltava() === 1;
+     * </pre>
+     */
+    public static void asetaTekija(Asukas as, Kotityo kt) {
+        if (kt.getSitaEdeltava() != -1) kt.setToistaEdeltava(kt.getSitaEdeltava());
+        if (kt.getEdellinenKerta() != -1) kt.setSitaEdeltava(kt.getEdellinenKerta());
+        if (kt.getSeuraavanaVuorossa() != -1) kt.setEdellinenKerta(kt.getSeuraavanaVuorossa());
+        kt.setSeuraavanaVuorossa(as.getId());
+    }
+    
+    
+    
+    /**
+     * Lisätään asukas 
+     * @param as lisättävä asukas
+     * @throws SailoException jos lisäystä ei voida tehdä
+     */
+    public void lisaaAsukas(Asukas as) throws SailoException {
+        asukkaat.lisaa(as);
+    }
+    
+    
+    /**
+     * Lisätään kotityo
+     * @param kt lisättävä kotityo
+     */
+    public void lisaaKotityo(Kotityo kt) {
+        kotityot.lisaaKotityo(kt);
+    }
+    
+    
+    /**
+     * Poistaa halutun asukkaan
+     * @param as poistettava asukas
+     */
+    public void poistaAsukas(Asukas as) {
+        
+        //asukkaat.poista(i, asukkaat.getLkm());
+    }
+    
+    
+    /**
+     * Poistaa halutun kotityön
+     * @param kt poistettava kotityö
+     */
+    public void poistaKotityo(Kotityo kt) {
+        kotityot.poistaKotityo(kt);
+    }
+    
+    
+    /**
+     * Lukee tiedostosta kämppisten tiedot
+     * @param tiednimi tiedoston nimi
+     * @throws SailoException jos tiedoston lukemisessa on ongelmia
+     */
+    public void lueTiedosto(String tiednimi) throws SailoException {
+        kotityot.lueTiedostosta(tiednimi);
+        asukkaat.LueTiedostosta(tiednimi);
+    }
+    
+    
+    /**
+     * @param args ei käytössä
+     */
+    public static void main(String[] args) {
+    // TODO Auto-generated method stub
+    
+    }
+
+}

@@ -1,0 +1,16 @@
++--------------------------------------+--------------------------------------+
+| Luokan nimi: Asukkaat                | Avustajat:                           |
++--------------------------------------+--------------------------------------+
+| Vastuualueet:                        | - Asukas                             |
+|                                      |                                      |
+| - pitää yllä varsinaista rekisteriä, |                                      |
+| eli osaa lisätä ja poistaa asukkaita |                                      |
+|                                      |                                      |
+| - lukee ja kirjoittaa asukkaat-      |                                      |
+| tiedostoon                           |                                      |
+|                                      |                                      |
+| - (osaa etsiä ja lajitella)          |                                      |
+|                                      |                                      |
+|                                      |                                      |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+

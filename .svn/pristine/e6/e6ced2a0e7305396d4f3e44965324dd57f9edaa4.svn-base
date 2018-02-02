@@ -1,0 +1,20 @@
+package KamppistenKotityotGUI;
+
+import fi.jyu.mit.fxgui.ModalController;
+import javafx.fxml.FXML;
+import javafx.scene.control.TextArea;
+
+/**
+ * @author Tomi Nyyssönen & Juho Kajanto
+ * @version 19.4.2016
+ *
+ */
+public class NaytaAsukkaanKotityotController {
+    @FXML
+    private TextArea tekstialue;
+
+    @FXML
+    void handleOK() {
+        ModalController.closeStage(tekstialue);
+    }
+}

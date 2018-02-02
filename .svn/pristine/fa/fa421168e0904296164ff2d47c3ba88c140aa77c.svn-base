@@ -1,0 +1,232 @@
+package KamppistenKotityotGUI;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
+
+import java.io.PrintStream;
+import java.net.URL;
+import java.util.ResourceBundle;
+
+import KamppistenKotityotAsukkaat.*;
+import KamppistenKotityotKamppistenKotityot.*;
+import KamppistenKotityotKotityot.*;
+
+import fi.jyu.mit.fxgui.*;
+
+
+/**
+ * Controller tiedosto KamppistenKotityotGUI ohjelmalle.
+ * @author Tomi Nyyssˆnen & Juho Kajanto
+ * @version 4.2.2016
+ *
+ */
+public class KamppistenKotityotController implements Initializable {
+	
+	private Asukkaat asukkaat = new Asukkaat();
+	private Kotityot ktt = new Kotityot();
+	private KamppistenKotityot kamppistenKotityot;
+	private ObservableList<Asukas> listdataAsukkaat = FXCollections.observableArrayList();
+	private ListView<Asukas> listAsukkaat = new ListView<Asukas>();
+	private TextArea areaAsukas = new TextArea();
+	private Asukas asukasKohdalla;
+	
+	@FXML private ScrollPane panelAsukas;
+	@FXML private ListChooser chooserAsukkaat;
+	
+	@Override
+	public void initialize(URL url, ResourceBundle bundle) {
+		alusta();
+	}
+	
+	/**
+     * Luokka, jolla hoidellaan miten asukas n‰ytet‰‰n listassa 
+     */
+    public static class CellAsukas extends ListCell<Asukas> {
+        @Override protected void updateItem(Asukas item, boolean empty) {
+            super.updateItem(item, empty); // ilman t‰t‰ ei n‰y valinta
+            setText(empty ? "" : item.getNimi());
+        }
+    }
+	
+    @FXML void handleLisaaAsukas() {
+        lisaaAsukas();
+    }
+
+    @FXML void handleLisaaKotityo() {
+        lisaaKotityo();
+    }
+
+    @FXML void handleMerkitseTehdyksi() {
+        merkitseTehdyksi();
+    }
+
+    @FXML void handleMerkitseTekijaksi() {
+        merkitseTekijaksi();
+    }
+
+    @FXML private void handlePoistaAsukas() throws SailoException {
+        poistaAsukas();
+    }
+
+    @FXML void handlePoistaKotityo() {
+        poistaKotityo();
+    }
+    
+    /**
+     * Alustetaan p‰‰ikkuna
+     */
+    protected void alusta() {
+        //panelAsukas.setContent(areaAsukas);
+        areaAsukas.setFont(new Font("Courier New", 12));
+        //panelAsukas.setFitToHeight(true);
+        BorderPane parent = (BorderPane)chooserAsukkaat.getParent();
+        parent.setCenter(listAsukkaat);
+        listAsukkaat.setCellFactory( p -> new CellAsukas() );
+        listAsukkaat.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            naytaAsukas();
+        });
+    }
+    
+    /**
+     * N‰ytt‰‰ listasta valitun asukkaan tiedot tilap‰isesti yhteen isoon edit-kentt‰‰n.
+     */
+    protected void naytaAsukas() {
+        asukasKohdalla = listAsukkaat.getSelectionModel().getSelectedItem();
+
+        if (asukasKohdalla == null) return;
+
+        areaAsukas.setText("");
+        try (PrintStream os = TextAreaOutputStream.getTextPrintStream(areaAsukas)) {
+            tulosta(os,asukasKohdalla);
+        }
+    }
+    
+    /**
+     * Tulostetaan asukkaan tiedot
+     * @param os mihin tulostetaan
+     * @param asukas mit‰ tulostetaan
+     */
+    public void tulosta(PrintStream os, final Asukas asukas) {
+        os.println("----------------------------------------------");
+        asukas.tulosta(os);
+        os.println("----------------------------------------------");
+        for (Kotityo kt : kamppistenKotityot.annaKotityot())  
+            kt.tulosta(os);     
+    }
+    
+    /**
+     * Tulostetaan asukkaat tekstialueeseen
+     * @param text alue johon tulostetaan
+     */
+    public void tulostaValitut(TextArea text) {
+        try (PrintStream os = TextAreaOutputStream.getTextPrintStream(text)) {
+            os.println("Tulostetaan kaikki j‰senet");
+            for (int i = 0; i < kamppistenKotityot.getAsukkaita(); i++) {
+                Asukas asukas = kamppistenKotityot.annaAsukas(i);
+                tulosta(os, asukas);
+                os.println("\n\n");
+            }
+        }
+    }
+    
+    /**
+     * @param kampKot k‰ytett‰v‰ k‰mmpisten kotityˆ
+     */
+    public void setKamppistenKotityot(KamppistenKotityot kampKot) {
+    	this.kamppistenKotityot = kampKot;
+    	naytaAsukas();
+    }
+    
+    /**
+     * Avaa ikkunan asukkaan lis‰‰miseksi.
+     */
+    protected void lisaaAsukas() {
+        //String lisaaAsukas = Dialogs.showInputDialog("Lis‰tt‰v‰n asukkaan nimi", "");
+        //if (lisaaAsukas == null) return;
+        Asukas uusi = new Asukas();
+        uusi.lisaaId();
+        uusi.vastaaTupu();
+        try {
+        	kamppistenKotityot.lisaaAsukas(uusi);
+        }
+        catch (SailoException e) {
+        	Dialogs.showMessageDialog("Ongelmia uuden luomisessa " + e.getMessage());
+        	return;
+        }
+        hae(uusi.getId());
+    }
+    
+    
+    /**
+     * Avaa ikkunan kotityˆn lis‰‰miseksi.
+     */
+    private void lisaaKotityo() {
+        String lisaaKotityo = Dialogs.showInputDialog("Lis‰tt‰v‰ kotityo", "");
+        if (lisaaKotityo == null) return;
+        Dialogs.showMessageDialog("Ei osata viel‰ lis‰t‰ kotityˆt‰");
+    }
+    
+    
+    /**
+     * Siirt‰‰ valitun tyˆn edellisiin kertoihin ja siirt‰‰ edellisill‰ kerroilla 
+     * tehtyj‰ tˆit‰ yhden taaksep‰in.
+     */
+    private void merkitseTehdyksi() {
+        Dialogs.showMessageDialog("Ei osata viel‰ merkit‰ tehdyksi");
+    }
+
+    
+    /**
+     * Merkitsee valitun asukkaan valitun kotityˆn tekij‰ksi.
+     */
+    private void merkitseTekijaksi() {
+        Dialogs.showMessageDialog("Ei osata viel‰ merkit‰ tekij‰‰");
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun asukkaan poiston varmistamiseksi. 
+     */
+    private void poistaAsukas() throws SailoException {
+        boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa asukkaan Tupu", "Kyll‰", "Peruuta");
+        if (vastaus == true) asukkaat.poista(0, asukkaat.getLkm());
+        return;
+    }
+    
+    
+    /**
+     * Avaa ikkunan valitun kotityˆn poiston varmistamiseksi.
+     */
+    private void poistaKotityo() {
+        boolean vastaus = Dialogs.showQuestionDialog("Poiston varmennus",
+                "Haluatko varmasti poistaa kotityˆn vessan siivous", "Kyll‰", "Peruuta");
+        if (vastaus == true) Dialogs.showMessageDialog("Ei osata poistaa kotityˆt‰");
+        return;
+    }
+    
+    /**
+     * Hakee asukkaan tiedot listaan
+     * @param id asukkaan viitenumero
+     */
+    protected void hae(int id) {
+    	listdataAsukkaat.clear();
+    	listAsukkaat.setItems(listdataAsukkaat);
+    	
+    	int index = 0;
+    	for(int i = 0; i < kamppistenKotityot.getAsukkaita(); i++) {
+    		Asukas asukas = kamppistenKotityot.annaAsukas(i);
+    		if (asukas.getId() == id) index = i;
+    		listdataAsukkaat.add(asukas);
+    	}
+    	listAsukkaat.getSelectionModel().select(index);
+    }
+}

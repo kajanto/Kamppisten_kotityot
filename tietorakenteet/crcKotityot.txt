@@ -1,0 +1,16 @@
+﻿+--------------------------------------+--------------------------------------+
+| Luokan nimi: Kotityot                | Avustajat:                           |
++--------------------------------------+--------------------------------------+
+| Vastuualueet:                        | - Kotityo                            |
+|                                      |                                      |
+| - pitää yllä varsinaista rekisteriä, |                                      |
+| eli osaa lisätä ja poistaa kotitöitä |                                      |
+|                                      |                                      |
+| - lukee ja kirjoittaa kotityot-      |                                      |
+| tiedostoon                           |                                      |
+|                                      |                                      |
+| - (osaa etsiä ja lajitella)          |                                      |
+|                                      |                                      |
+|                                      |                                      |
+|                                      |                                      |
++--------------------------------------+--------------------------------------+
